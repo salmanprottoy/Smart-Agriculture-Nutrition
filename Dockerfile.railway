@@ -12,8 +12,8 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Production stage
-FROM tomcat:9.0-jdk17-openjdk-slim
+# Production stage - use Java 11 for better container compatibility
+FROM tomcat:9.0-jdk11-openjdk-slim
 
 # Remove default webapps
 RUN rm -rf /usr/local/tomcat/webapps/*
