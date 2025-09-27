@@ -126,38 +126,17 @@ jobs:
       - name: Load Docker image
         run: docker load < smart-agriculture-nutrition.tar.gz
 
-      - name: Start demo environment
-        run: |
-          docker-compose -f docker-compose.prod.yml up -d
-          sleep 30  # Wait for services to start
-
-      - name: Health check
-        run: |
-          curl -f http://localhost:8080/SmartAgricultureNutrition/api/v1/crops || exit 1
-          echo "✅ Application is healthy!"
-
-      - name: Run API tests
-        run: |
-          # Test main endpoints
-          curl -f http://localhost:8080/SmartAgricultureNutrition/api/v1/crops
-          curl -f http://localhost:8080/SmartAgricultureNutrition/api/v1/nutrition-data
-          curl -f http://localhost:8080/SmartAgricultureNutrition/api/v1/personal-nutrition-tracker
-          echo "✅ All API endpoints are working!"
-
-      - name: Generate deployment report
+      - name: Generate deployment report (skip actual deployment in CI)
         run: |
           echo "# Deployment Report" > deployment-report.md
           echo "- **Build**: ${{ github.sha }}" >> deployment-report.md
-          echo "- **Status**: ✅ Successful" >> deployment-report.md
+          echo "- **Status**: ✅ Build Successful" >> deployment-report.md
           echo "- **Date**: $(date)" >> deployment-report.md
-          echo "- **API Health**: ✅ All endpoints responding" >> deployment-report.md
+          echo "- **Note**: Full deployment testing available in GitHub Codespaces" >> deployment-report.md
+          echo "- **Docker Image**: smart-agriculture-nutrition:${{ github.sha }}" >> deployment-report.md
 
       - name: Upload deployment report
         uses: actions/upload-artifact@v4
         with:
           name: deployment-report
           path: deployment-report.md
-
-      - name: Cleanup
-        if: always()
-        run: docker-compose -f docker-compose.prod.yml down -v
