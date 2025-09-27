@@ -25,9 +25,10 @@ COPY --from=build /app/target/SmartAgricultureNutrition.war /usr/local/tomcat/we
 RUN mkdir -p /usr/local/tomcat/conf/agriculture
 COPY src/main/resources/application.properties /usr/local/tomcat/conf/agriculture/
 
-# Set environment variables for Railway - simplified JVM options for compatibility
+# Set environment variables for Railway - disable all management features
 ENV CATALINA_OPTS="-Xmx512m -Xms256m"
-ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true -Dcom.sun.management.jmxremote=false -Djava.net.preferIPv4Stack=true"
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true -Dcom.sun.management.jmxremote=false -Djava.net.preferIPv4Stack=true -XX:+IgnoreUnrecognizedVMOptions -XX:+DisableAttachMechanism"
+ENV JDK_JAVA_OPTIONS=""
 
 # Set the port for Tomcat to use Railway's PORT
 ENV SERVER_PORT=${PORT:-8080}
