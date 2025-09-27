@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Agriculture Nutrition API</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+          sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f8f9fa;
+      }
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+      }
+      .header p {
+        margin: 0.5rem 0 0 0;
+        font-size: 1.2rem;
+        opacity: 0.9;
+      }
+      .container {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+      .card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #667eea;
+      }
+      .card h3 {
+        margin-top: 0;
+        color: #667eea;
+      }
+      .btn {
+        display: inline-block;
+        background: #667eea;
+        color: white;
+        padding: 12px 24px;
+        text-decoration: none;
+        border-radius: 5px;
+        margin: 10px 10px 10px 0;
+        transition: background 0.3s;
+      }
+      .btn:hover {
+        background: #5a6fd8;
+      }
+      .btn-secondary {
+        background: #6c757d;
+      }
+      .btn-secondary:hover {
+        background: #5a6268;
+      }
+      .feature-list {
+        list-style: none;
+        padding: 0;
+      }
+      .feature-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+      }
+      .feature-list li:before {
+        content: "✅ ";
+        margin-right: 0.5rem;
+      }
+      .code-block {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 5px;
+        padding: 1rem;
+        margin: 1rem 0;
+        overflow-x: auto;
+      }
+      .endpoints {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 5px;
+        margin: 1rem 0;
+      }
+      .endpoint {
+        margin: 0.5rem 0;
+        font-family: monospace;
+        background: white;
+        padding: 0.5rem;
+        border-radius: 3px;
+        border-left: 3px solid #28a745;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🌱 Smart Agriculture Nutrition API</h1>
+      <p>Connecting Smart Agriculture Data with Personal Nutrition Tracking</p>
+    </div>
+
+    <div class="container">
+      <h2>🚀 Quick Start</h2>
+      <p>
+        Get started with your Smart Agriculture Nutrition API in seconds using
+        GitHub Codespaces:
+      </p>
+
+      <a
+        href="https://github.com/salmanprottoy/Smart-Agriculture-Nutrition"
+        class="btn"
+        >View Repository</a
+      >
+      <a
+        href="https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=salmanprottoy/Smart-Agriculture-Nutrition"
+        class="btn btn-secondary"
+        >Launch Codespace</a
+      >
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>🔧 Features</h3>
+        <ul class="feature-list">
+          <li>RESTful API for crop nutrition data</li>
+          <li>Personal nutrition tracking</li>
+          <li>Weather integration</li>
+          <li>Correlation analysis</li>
+          <li>PostgreSQL database</li>
+          <li>Docker containerization</li>
+          <li>Comprehensive testing</li>
+          <li>CI/CD pipeline</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>🌐 API Endpoints</h3>
+        <div class="endpoints">
+          <div class="endpoint">GET /api/v1/crop-nutrition-profiles</div>
+          <div class="endpoint">GET /api/v1/nutrition-data</div>
+          <div class="endpoint">GET /api/v1/personal-nutrition-tracker</div>
+          <div class="endpoint">GET /api/v1/weather</div>
+          <div class="endpoint">GET /api/v1/correlation/nutrition-weather</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>💻 Development</h3>
+        <p>Start developing instantly with GitHub Codespaces:</p>
+        <div class="code-block">
+          <strong>1. Launch Codespace</strong><br />
+          Click "Launch Codespace" above<br /><br />
+          <strong>2. Build & Run</strong><br />
+          mvn clean package<br />
+          docker-compose up<br /><br />
+          <strong>3. Test</strong><br />
+          mvn verify
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🧪 Testing</h3>
+        <ul class="feature-list">
+          <li>Unit tests with JUnit 5</li>
+          <li>Integration tests with Testcontainers</li>
+          <li>Load testing with JMeter</li>
+          <li>Code coverage with JaCoCo</li>
+          <li>API mocking with WireMock</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>🏗️ Architecture</h3>
+        <ul class="feature-list">
+          <li>Java 17 with JAX-RS</li>
+          <li>PostgreSQL database</li>
+          <li>Docker & Docker Compose</li>
+          <li>GitHub Actions CI/CD</li>
+          <li>Swagger/OpenAPI documentation</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>📊 CI/CD Pipeline</h3>
+        <ul class="feature-list">
+          <li>Automated testing on every push</li>
+          <li>Docker image building</li>
+          <li>Artifact generation</li>
+          <li>Build verification</li>
+          <li>Deployment reports</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container">
+      <h2>📖 Documentation</h2>
+      <p>Comprehensive documentation and guides:</p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>📋 README</h3>
+          <p>Complete setup and usage instructions</p>
+          <a
+            href="https://github.com/salmanprottoy/Smart-Agriculture-Nutrition/blob/main/README.md"
+            class="btn"
+            >View README</a
+          >
+        </div>
+
+        <div class="card">
+          <h3>🚀 Deployment Guide</h3>
+          <p>Step-by-step deployment instructions</p>
+          <a
+            href="https://github.com/salmanprottoy/Smart-Agriculture-Nutrition/blob/main/DEPLOYMENT.md"
+            class="btn"
+            >View Guide</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <h2>👥 Team</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Developers</h3>
+          <ul>
+            <li>
+              <strong>Md. Salman Hossan Prottoy</strong> -
+              md.sh.prottoy@student.jyu.fi
+            </li>
+            <li>
+              <strong>Elham Pournouri</strong> -
+              elham.e.pournouri@student.jyu.fi
+            </li>
+            <li>
+              <strong>Md Ariful Islam</strong> - md.ar.islam@student.jyu.fi
+            </li>
+            <li>
+              <strong>Jakub Formánek</strong> - jakub.j.formanek@student.jyu.fi
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="container"
+      style="
+        text-align: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      "
+    >
+      <h2>🎯 Ready to Get Started?</h2>
+      <p>
+        Launch your development environment in seconds with GitHub Codespaces
+      </p>
+      <a
+        href="https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=salmanprottoy/Smart-Agriculture-Nutrition"
+        class="btn"
+        style="background: white; color: #667eea"
+        >Launch Codespace Now</a
+      >
+    </div>
+  </body>
+</html>
