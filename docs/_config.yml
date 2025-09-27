@@ -1,0 +1,64 @@
+title: Smart Agriculture Nutrition REST API
+description: A comprehensive REST API for managing crop nutrition data, personal nutrition tracking, and agricultural insights.
+url: "https://salmanprottoy.github.io"
+baseurl: "/Smart-Agriculture-Nutrition"
+
+# Theme
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Navigation
+header_pages:
+  - index.md
+
+# Social links
+github_username: salmanprottoy
+linkedin_username: salman-prottoy
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "default"
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - .github/
+  - .devcontainer/
+  - target/
+  - src/
+  - pom.xml
+  - docker-compose*.yml
+  - Dockerfile*
+  - nginx/
+  - database/

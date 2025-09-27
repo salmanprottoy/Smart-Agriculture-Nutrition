@@ -1,0 +1,59 @@
+{
+  "name": "Smart Agriculture Nutrition API",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "postgres",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "installMaven": "true"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "redhat.vscode-xml",
+        "ms-vscode.vscode-json",
+        "ms-azuretools.vscode-docker",
+        "humao.rest-client",
+        "42Crunch.vscode-openapi",
+        "ms-vscode.vscode-yaml"
+      ],
+      "settings": {
+        "java.home": "/usr/local/sdkman/candidates/java/current",
+        "maven.executable.path": "/usr/local/sdkman/candidates/maven/current/bin/mvn",
+        "java.configuration.updateBuildConfiguration": "automatic",
+        "java.compile.nullAnalysis.mode": "automatic"
+      }
+    }
+  },
+
+  "forwardPorts": [8080, 5432, 5050, 8081],
+  "portsAttributes": {
+    "8080": {
+      "label": "Smart Agriculture API",
+      "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "PostgreSQL Database"
+    },
+    "5050": {
+      "label": "pgAdmin"
+    },
+    "8081": {
+      "label": "Adminer"
+    }
+  },
+
+  "postCreateCommand": "mvn clean compile",
+  "postStartCommand": "docker-compose up -d",
+
+  "remoteUser": "vscode"
+}
