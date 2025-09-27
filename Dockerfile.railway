@@ -26,11 +26,22 @@ RUN mkdir -p /usr/local/tomcat/conf/agriculture
 COPY src/main/resources/application.properties /usr/local/tomcat/conf/agriculture/
 
 # Set environment variables for Railway
-ENV CATALINA_OPTS="-Xmx512m -Xms256m"
-ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
+ENV CATALINA_OPTS="-Xmx512m -Xms256m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true"
+
+# Set the port for Tomcat to use Railway's PORT
+ENV SERVER_PORT=${PORT:-8080}
 
 # Expose port (Railway will map this automatically)
-EXPOSE $PORT
+EXPOSE ${PORT:-8080}
 
-# Start Tomcat on Railway's PORT
-CMD ["sh", "-c", "sed -i 's/8080/'\"$PORT\"'/g' /usr/local/tomcat/conf/server.xml && catalina.sh run"]
+# Create a simple startup script
+RUN echo '#!/bin/bash\n\
+    export CATALINA_OPTS="$CATALINA_OPTS -Dserver.port=$PORT"\n\
+    if [ ! -z "$PORT" ]; then\n\
+    sed -i "s/port=\"8080\"/port=\"$PORT\"/g" /usr/local/tomcat/conf/server.xml\n\
+    fi\n\
+    exec catalina.sh run' > /usr/local/tomcat/bin/start.sh && chmod +x /usr/local/tomcat/bin/start.sh
+
+# Start Tomcat with the startup script
+CMD ["/usr/local/tomcat/bin/start.sh"]
