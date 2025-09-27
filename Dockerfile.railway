@@ -30,7 +30,7 @@ ENV CATALINA_OPTS="-Xmx512m -Xms256m"
 ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
 
 # Expose port (Railway will map this automatically)
-EXPOSE 8080
+EXPOSE $PORT
 
-# Start Tomcat
-CMD ["catalina.sh", "run"]
+# Start Tomcat on Railway's PORT
+CMD ["sh", "-c", "sed -i 's/8080/'\"$PORT\"'/g' /usr/local/tomcat/conf/server.xml && catalina.sh run"]
