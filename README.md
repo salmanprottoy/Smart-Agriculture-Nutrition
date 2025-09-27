@@ -47,10 +47,10 @@ The Smart Agriculture Nutrition bridges the gap between agricultural production 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Java 21 or higher
-- Maven 3.6+
-- Docker & Docker Compose
-- Application Server (Tomcat, WildFly, etc.)
+- Docker & Docker Compose (Recommended)
+- OR Java 21+ and Maven 3.6+ for manual deployment
+
+## 🐳 Docker Production Deployment (Recommended)
 
 ### 1. Clone/Extract Project
 ```bash
@@ -58,16 +58,53 @@ The Smart Agriculture Nutrition bridges the gap between agricultural production 
 cd SmartAgricultureNutrition
 ```
 
-### 2. Start Database Services
+### 2. Start Complete Production Stack
 ```bash
-# Start PostgreSQL, pgAdmin, and Adminer
+# Start all services with production configuration
+docker-compose -f docker-compose.prod.yml up -d
+
+# Verify all services are running
+docker-compose -f docker-compose.prod.yml ps
+```
+
+**This single command starts:**
+- ✅ **Java Application** (Multi-stage build with Maven + Tomcat 9)
+- ✅ **PostgreSQL Database** (with health checks and sample data)
+- ✅ **Nginx Reverse Proxy** (load balancing and static content)
+- ✅ **pgAdmin** (database management interface)
+- ✅ **Adminer** (lightweight database tool)
+
+### 3. Access the Production Application
+- **🌐 Main Application (via Nginx)**: `http://localhost/`
+- **🔗 API Base URL (via Nginx)**: `http://localhost/SmartAgricultureNutrition/api/v1/`
+- **📖 Swagger UI**: `http://localhost/SmartAgricultureNutrition/api/v1/swagger-ui`
+- **📋 OpenAPI Spec**: `http://localhost/SmartAgricultureNutrition/api/v1/openapi.json`
+- **🗄️ pgAdmin**: `http://localhost:5050` (admin@agriculture.com / admin123)
+- **⚡ Adminer**: `http://localhost:8081`
+- **🏥 Health Check**: `http://localhost/health`
+
+### 4. Direct Application Access (Bypass Nginx)
+- **Main Application**: `http://localhost:8080/SmartAgricultureNutrition/`
+- **API Base URL**: `http://localhost:8080/SmartAgricultureNutrition/api/v1/`
+
+## 🛠️ Manual Development Setup
+
+### Prerequisites for Manual Setup
+- Java 21 or higher
+- Maven 3.6+
+- Docker & Docker Compose (for database services)
+- Application Server (Tomcat, WildFly, etc.)
+
+### 1. Start Database Services Only
+```bash
+# Start PostgreSQL, pgAdmin, and Adminer only
 docker-compose up -d
 
 # Verify services are running
 docker-compose ps
 ```
 
-### 3. Populate Database with Sample Data
+### 2. Populate Database with Sample Data
 ```bash
 # Run the sample data migration (includes 97 comprehensive records)
 docker exec -i smart-agriculture-db psql -U agriculture_user -d smart_agriculture_nutrition < "src/main/resources/db/migration/sample_data.sql"
@@ -82,7 +119,7 @@ docker exec smart-agriculture-db psql -U agriculture_user -d smart_agriculture_n
 - 21 harvest_batches
 - 34 meal_sources
 
-### 4. Build and Deploy Application
+### 3. Build and Deploy Application Manually
 ```bash
 # Build the project
 mvn clean package -Dmaven.test.skip=true
@@ -92,7 +129,7 @@ mvn clean package -Dmaven.test.skip=true
 # Or use your IDE's deployment features
 ```
 
-### 5. Access the Application
+### 4. Access the Manual Deployment
 - **Main Application**: `http://localhost:8080/SmartAgricultureNutrition/`
 - **API Base URL**: `http://localhost:8080/SmartAgricultureNutrition/api/v1/`
 - **Swagger UI**: `http://localhost:8080/SmartAgricultureNutrition/api/v1/swagger-ui`
@@ -263,30 +300,57 @@ mvn jmeter:jmeter
 
 ## 🚀 Deployment
 
+### 🐳 Production Docker Deployment (Recommended)
+```bash
+# Complete production stack with single command
+docker-compose -f docker-compose.prod.yml up -d --build
+
+# Check all services status
+docker-compose -f docker-compose.prod.yml ps
+
+# View logs if needed
+docker-compose -f docker-compose.prod.yml logs -f app
+docker-compose -f docker-compose.prod.yml logs -f nginx
+```
+
+**Production Stack Includes:**
+- **Java Application**: Multi-stage Docker build (Maven + Tomcat 9 + Java 17)
+- **PostgreSQL Database**: Persistent storage with health checks
+- **Nginx Reverse Proxy**: Load balancing and static content serving
+- **Database Tools**: pgAdmin and Adminer for management
+
 ### Development
 ```bash
-# Start all services
+# Start database services only
 docker-compose up -d
 
-# Build and deploy
+# Build and deploy manually
 mvn clean compile war:war
 # Deploy target/SmartAgricultureNutrition.war to your server
 ```
 
-### Production
+### Manual Production Build
 ```bash
-# Production build
-mvn clean compile war:war -P production
+# Production WAR build
+mvn clean package -DskipTests
 
-# Use nginx configuration for load balancing
-# See nginx/nginx.conf for configuration
+# Deploy WAR file to your application server
+# Copy target/SmartAgricultureNutrition.war to server's webapps directory
 ```
 
-### Docker Services
+### Docker Services & Ports
+- **Java Application**: Port 8080 (Direct access)
+- **Nginx Reverse Proxy**: Port 80 (Production access)
 - **PostgreSQL**: Port 5432 (Database)
 - **pgAdmin**: Port 5050 (Database Management)
 - **Adminer**: Port 8081 (Alternative DB Tool)
-- **Nginx**: Port 80 (Load Balancer - when enabled)
+
+### Production Features
+- **Multi-stage Docker Build**: Optimized image size with build and runtime stages
+- **Health Checks**: Automatic service health monitoring
+- **Persistent Volumes**: Database data persistence across container restarts
+- **Nginx Load Balancing**: Production-ready reverse proxy configuration
+- **Environment Configuration**: Separate development and production settings
 
 ## 🔧 Configuration
 
