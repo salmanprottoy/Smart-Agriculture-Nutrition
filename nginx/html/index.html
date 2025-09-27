@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Agriculture Nutrition API</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 30px;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      .api-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+      }
+      .api-card {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transition: transform 0.3s ease;
+      }
+      .api-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.3);
+      }
+      .api-card h3 {
+        margin-top: 0;
+        color: #fff;
+      }
+      .api-card a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 10px;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+        transition: background 0.3s ease;
+      }
+      .api-card a:hover {
+        background: rgba(255, 255, 255, 0.4);
+      }
+      .status {
+        text-align: center;
+        margin: 20px 0;
+        padding: 15px;
+        background: rgba(0, 255, 0, 0.2);
+        border-radius: 8px;
+        border: 1px solid rgba(0, 255, 0, 0.3);
+      }
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.3);
+        font-size: 0.9em;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🌱 Smart Agriculture Nutrition API</h1>
+
+      <div class="status">
+        <h3>✅ API Server Running</h3>
+        <p>Welcome to the Smart Agriculture Nutrition REST API</p>
+      </div>
+
+      <div class="api-links">
+        <div class="api-card">
+          <h3>📚 API Documentation</h3>
+          <p>Interactive Swagger UI for testing API endpoints</p>
+          <a href="/SmartAgricultureNutrition/swagger-ui" target="_blank"
+            >Open Swagger UI</a
+          >
+        </div>
+
+        <div class="api-card">
+          <h3>🌾 Crop Nutrition Profiles</h3>
+          <p>Manage crop nutrition data and harvest information</p>
+          <a href="/SmartAgricultureNutrition/api/v1/crops" target="_blank"
+            >View Crops API</a
+          >
+        </div>
+
+        <div class="api-card">
+          <h3>👤 Personal Nutrition Tracking</h3>
+          <p>Track personal nutrition and meal sources</p>
+          <a href="/SmartAgricultureNutrition/api/v1/trackers" target="_blank"
+            >View Trackers API</a
+          >
+        </div>
+
+        <div class="api-card">
+          <h3>🌤️ Weather Integration</h3>
+          <p>Get weather data for agricultural planning</p>
+          <a
+            href="/SmartAgricultureNutrition/api/v1/weather/Helsinki"
+            target="_blank"
+            >View Weather API</a
+          >
+        </div>
+
+        <div class="api-card">
+          <h3>🔗 Health Correlations</h3>
+          <p>Analyze correlations between crops and health metrics</p>
+          <a
+            href="/SmartAgricultureNutrition/api/v1/correlations"
+            target="_blank"
+            >View Correlations API</a
+          >
+        </div>
+
+        <div class="api-card">
+          <h3>🍎 Nutrition Data</h3>
+          <p>Access USDA nutrition database integration</p>
+          <a
+            href="/SmartAgricultureNutrition/api/v1/nutrition/search?query=apple"
+            target="_blank"
+            >View Nutrition API</a
+          >
+        </div>
+      </div>
+
+      <div class="footer">
+        <p><strong>Smart Agriculture Nutrition REST API</strong></p>
+        <p>
+          Developed by: Md. Salman Hossan Prottoy, Elham Pournouri, Md Ariful
+          Islam, Jakub Formánek
+        </p>
+        <p>
+          University of Jyväskylä - TIES 4560 Service-Oriented Architecture and
+          Cloud Computing
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
