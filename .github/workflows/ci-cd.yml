@@ -51,8 +51,8 @@ jobs:
           DB_USER: agriculture_user
           DB_PASSWORD: test_password
 
-      - name: Skip integration tests (API not deployed in CI)
-        run: mvn verify -DskipITs -Djacoco.skip=true
+      - name: Skip integration tests and JMeter (API not deployed in CI)
+        run: mvn verify -DskipITs -Djacoco.skip=true -Djmeter.skip=true
         env:
           DB_HOST: localhost
           DB_PORT: 5432
