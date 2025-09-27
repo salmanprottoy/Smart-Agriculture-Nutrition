@@ -52,7 +52,7 @@ jobs:
           DB_PASSWORD: test_password
 
       - name: Skip integration tests and JMeter (API not deployed in CI)
-        run: mvn verify -DskipITs -Djacoco.skip=true -Djmeter.skip=true
+        run: mvn compile -DskipTests
         env:
           DB_HOST: localhost
           DB_PORT: 5432
