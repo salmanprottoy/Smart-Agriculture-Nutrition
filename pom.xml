@@ -11,6 +11,25 @@
     <name>Smart Agriculture Nutrition</name>
     <description>REST service connecting smart agriculture data with personal nutrition tracking</description>
 
+    <developers>
+        <developer>
+            <name>Md. Salman Hossan Prottoy</name>
+            <email>md.sh.prottoy@student.jyu.fi</email>
+        </developer>
+        <developer>
+            <name>Elham Pournouri</name>
+            <email>elham.e.pournouri@student.jyu.fi</email>
+        </developer>
+        <developer>
+            <name>Md Ariful Islam</name>
+            <email>md.ar.islam@student.jyu.fi</email>
+        </developer>
+        <developer>
+            <name>Jakub Formánek</name>
+            <email>jakub.j.formanek@student.jyu.fi</email>
+        </developer>
+    </developers>
+
     <build>
         <finalName>SmartAgricultureNutrition</finalName>
         <plugins>

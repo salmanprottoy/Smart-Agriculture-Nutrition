@@ -208,7 +208,7 @@ Real user names from your class including:
 - Alejandro Fernandez Armas, Arsalan Vosough, Hassan Syed, Zoltan Papp
 - Muhammad Feroz, Haben Eyasu, Ke Qiu, Danial Farooq, Javeria Kanwal
 - Sofiia Mikhailova, João Moreira, Luca Stoian, Sufian Embark Aomar
-- Elham Pournouri, Md Ariful Islam, Md. Salman Hossan Prottoy
+- Md. Salman Hossan Prottoy, Elham Pournouri, Md Ariful Islam
 - Jakub Formánek, Muhammad Hassan Ali, Talha Bin Nayyar
 - Sibrah Rahim, Sana Mazhar, Asma Sikandar
 
