@@ -1,9 +1,6 @@
 {
   "name": "Smart Agriculture Nutrition API",
-  "dockerComposeFile": "../docker-compose.yml",
-  "service": "postgres",
-  "workspaceFolder": "/workspace",
-  "shutdownAction": "stopCompose",
+  "image": "mcr.microsoft.com/devcontainers/java:1-17-bullseye",
 
   "features": {
     "ghcr.io/devcontainers/features/java:1": {
@@ -27,8 +24,6 @@
         "ms-vscode.vscode-yaml"
       ],
       "settings": {
-        "java.home": "/usr/local/sdkman/candidates/java/current",
-        "maven.executable.path": "/usr/local/sdkman/candidates/maven/current/bin/mvn",
         "java.configuration.updateBuildConfiguration": "automatic",
         "java.compile.nullAnalysis.mode": "automatic"
       }
@@ -52,8 +47,7 @@
     }
   },
 
-  "postCreateCommand": "mvn clean compile",
-  "postStartCommand": "docker-compose up -d",
+  "postCreateCommand": "echo 'Development environment ready! Run: mvn clean package && docker-compose up -d'",
 
   "remoteUser": "vscode"
 }
