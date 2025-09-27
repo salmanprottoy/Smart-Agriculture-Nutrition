@@ -291,7 +291,7 @@ public CropNutritionProfile addHATEOASLinks(CropNutritionProfile profile) {
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    CLIENT APPLICATIONS                      │
-│  (Web Browsers, Mobile Apps, Third-party Integrations)     │
+│  (Web Browsers, Mobile Apps, Third-party Integrations)      │
 └─────────────────────┬───────────────────────────────────────┘
                       │ HTTP/HTTPS Requests
                       ▼
@@ -307,20 +307,20 @@ public CropNutritionProfile addHATEOASLinks(CropNutritionProfile profile) {
 │  ┌─────────────────────────────────────────────────────────┐│
 │  │            SMART AGRICULTURE API                        ││
 │  │                                                         ││
-│  │  ┌─────────────────┐  ┌─────────────────┐              ││
-│  │  │   JAX-RS        │  │   Jersey        │              ││
-│  │  │   Resources     │  │   Framework     │              ││
-│  │  └─────────────────┘  └─────────────────┘              ││
+│  │  ┌─────────────────┐  ┌─────────────────┐               ││
+│  │  │   JAX-RS        │  │   Jersey        │               ││
+│  │  │   Resources     │  │   Framework     │               ││
+│  │  └─────────────────┘  └─────────────────┘               ││
 │  │                                                         ││
-│  │  ┌─────────────────┐  ┌─────────────────┐              ││
-│  │  │   Service       │  │   Exception     │              ││
-│  │  │   Layer         │  │   Handlers      │              ││
-│  │  └─────────────────┘  └─────────────────┘              ││
+│  │  ┌─────────────────┐  ┌─────────────────┐               ││
+│  │  │   Service       │  │   Exception     │               ││
+│  │  │   Layer         │  │   Handlers      │               ││
+│  │  └─────────────────┘  └─────────────────┘               ││
 │  │                                                         ││
-│  │  ┌─────────────────┐  ┌─────────────────┐              ││
-│  │  │   Data Access   │  │   JDBC          │              ││
-│  │  │   Layer         │  │   Operations    │              ││
-│  │  └─────────────────┘  └─────────────────┘              ││
+│  │  ┌─────────────────┐  ┌─────────────────┐               ││
+│  │  │   Data Access   │  │   JDBC          │               ││
+│  │  │   Layer         │  │   Operations    │               ││
+│  │  └─────────────────┘  └─────────────────┘               ││
 │  └─────────────────────────────────────────────────────────┘│
 └─────────────────────┬───────────────────────────────────────┘
                       │ JDBC Connections
@@ -329,20 +329,20 @@ public CropNutritionProfile addHATEOASLinks(CropNutritionProfile profile) {
 │                   DATABASE LAYER                            │
 │                   (PostgreSQL 15)                           │
 │  ┌─────────────────────────────────────────────────────────┐│
-│  │  Tables: crop_nutrition_profiles,                      ││
-│  │          personal_nutrition_trackers,                  ││
-│  │          harvest_batches, meal_sources                 ││
+│  │  Tables: crop_nutrition_profiles,                       ││
+│  │          personal_nutrition_trackers,                   ││
+│  │          harvest_batches, meal_sources                  ││
 │  │                                                         ││
-│  │  Features: JSONB, Arrays, Indexing, Constraints       ││
+│  │  Features: JSONB, Arrays, Indexing, Constraints         ││
 │  └─────────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
 │                  EXTERNAL SERVICES                          │
-│  ┌─────────────────┐  ┌─────────────────┐                  │
-│  │   WeatherAPI    │  │   USDA Food     │                  │
-│  │   .com          │  │   Data Central  │                  │
-│  └─────────────────┘  └─────────────────┘                  │
+│  ┌─────────────────┐  ┌─────────────────┐                   │
+│  │   WeatherAPI    │  │   USDA Food     │                   │
+│  │   .com          │  │   Data Central  │                   │
+│  └─────────────────┘  └─────────────────┘                   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -598,38 +598,38 @@ public class CropNutritionResource {
 
 #### **Entity Relationship Diagram**
 ```
-┌─────────────────────────┐         ┌─────────────────────────┐
+┌─────────────────────────┐         ┌───────────────────────────┐
 │  crop_nutrition_profiles│         │personal_nutrition_trackers│
-│                         │         │                         │
-│  id (PK)               │         │  id (PK)               │
-│  crop_name             │         │  user_name             │
-│  farm_location         │         │  age                   │
-│  growing_method        │         │  current_bmi           │
-│  soil_nutrients (JSONB)│         │  health_goals (ARRAY)  │
-│  crop_nutrients (JSONB)│         │  dietary_restrictions  │
-│  expected_harvest_date │         │  daily_nutrient_intake │
-│  sustainability_score  │         │  farm_to_fork_score    │
-│  certifications (ARRAY)│         │  created_at            │
-│  created_at            │         │  updated_at            │
-│  updated_at            │         │                         │
-└─────────────────────────┘         └─────────────────────────┘
+│                         │         │                           │
+│  id (PK)                │         │  id (PK)                  │
+│  crop_name              │         │  user_name                │
+│  farm_location          │         │  age                      │
+│  growing_method         │         │  current_bmi              │
+│  soil_nutrients (JSONB) │         │  health_goals (ARRAY)     │
+│  crop_nutrients (JSONB) │         │  dietary_restrictions     │
+│  expected_harvest_date  │         │  daily_nutrient_intake    │
+│  sustainability_score   │         │  farm_to_fork_score       │
+│  certifications (ARRAY) │         │  created_at               │
+│  created_at             │         │  updated_at               │
+│  updated_at             │         │                           │
+└─────────────────────────┘         └───────────────────────────┘
            │                                   │
            │ 1:N                               │ 1:N
            ▼                                   ▼
 ┌─────────────────────────┐         ┌─────────────────────────┐
 │    harvest_batches      │         │      meal_sources       │
 │                         │         │                         │
-│  id (PK)               │         │  id (PK)               │
-│  crop_profile_id (FK)  │         │  tracker_id (FK)       │
-│  harvest_date          │         │  meal_name             │
-│  quantity_kg           │         │  meal_date             │
-│  quality_grade         │         │  ingredients (JSONB)   │
-│  actual_nutrients      │         │  local_source_percentage│
-│  storage_conditions    │         │  nutritional_density   │
-│  batch_notes           │         │  farm_origins (ARRAY)  │
-│  created_at            │         │  meal_notes            │
-│  updated_at            │         │  created_at            │
-└─────────────────────────┘         │  updated_at            │
+│  id (PK)                │         │  id (PK)                │
+│  crop_profile_id (FK)   │         │  tracker_id (FK)        │
+│  harvest_date           │         │  meal_name              │
+│  quantity_kg            │         │  meal_date              │
+│  quality_grade          │         │  ingredients (JSONB)    │
+│  actual_nutrients       │         │  local_source_percentage│
+│  storage_conditions     │         │  nutritional_density    │
+│  batch_notes            │         │  farm_origins (ARRAY).  │
+│  created_at             │         │  meal_notes             │
+│  updated_at             │         │  created_at             │
+└─────────────────────────┘         │  updated_at             │
                                     └─────────────────────────┘
 ```
 
