@@ -1,9 +1,0 @@
-{
-  "build": {
-    "builder": "dockerfile",
-    "dockerfilePath": "Dockerfile.railway"
-  },
-  "deploy": {
-    "startCommand": "catalina.sh run"
-  }
-}
