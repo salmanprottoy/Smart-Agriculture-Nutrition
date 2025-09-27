@@ -25,9 +25,9 @@ COPY --from=build /app/target/SmartAgricultureNutrition.war /usr/local/tomcat/we
 RUN mkdir -p /usr/local/tomcat/conf/agriculture
 COPY src/main/resources/application.properties /usr/local/tomcat/conf/agriculture/
 
-# Set environment variables for Railway - disable problematic container detection
-ENV CATALINA_OPTS="-Xmx512m -Xms256m -XX:-UseContainerSupport -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true -Dcom.sun.management.jmxremote=false"
+# Set environment variables for Railway - simplified JVM options for compatibility
+ENV CATALINA_OPTS="-Xmx512m -Xms256m"
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true -Dcom.sun.management.jmxremote=false -Djava.net.preferIPv4Stack=true"
 
 # Set the port for Tomcat to use Railway's PORT
 ENV SERVER_PORT=${PORT:-8080}
