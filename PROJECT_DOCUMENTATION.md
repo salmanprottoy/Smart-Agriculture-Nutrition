@@ -1014,44 +1014,44 @@ mvn clean test jacoco:check spotbugs:check checkstyle:check
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              CLIENT LAYER                                      │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │   Web App   │  │ Mobile App  │  │ IoT Devices │  │ Third Party │          │
-│  │             │  │             │  │             │  │ Integrations│          │
-│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘          │
+│                              CLIENT LAYER                                       │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐             │
+│  │   Web App   │  │ Mobile App  │  │ IoT Devices │  │ Third Party │             │
+│  │             │  │             │  │             │  │ Integrations│             │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘             │
 └─────────────────────────────────────┬───────────────────────────────────────────┘
                                       │ HTTPS/WSS
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              API GATEWAY                                       │
-│              (Kong, AWS API Gateway, Azure API Management)                     │
+│                              API GATEWAY                                        │
+│              (Kong, AWS API Gateway, Azure API Management)                      │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
-│  │  Authentication │ Rate Limiting │ Load Balancing │ Request Routing        ││
-│  │  Authorization  │ Caching       │ SSL Termination│ Response Transform     ││
-│  │  API Versioning │ Monitoring    │ Circuit Breaker│ Request Validation     ││
+│  │  Authentication │ Rate Limiting │ Load Balancing │ Request Routing          ││
+│  │  Authorization  │ Caching       │ SSL Termination│ Response Transform       ││
+│  │  API Versioning │ Monitoring    │ Circuit Breaker│ Request Validation       ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 └─────────────────────────────────────┬───────────────────────────────────────────┘
                                       │ Internal Network
                     ┌─────────────────┼─────────────────┐
                     │                 │                 │
                     ▼                 ▼                 ▼
-        ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+        ┌─────────────────┐ ┌──────────────────┐ ┌──────────────────┐
         │   CROP SERVICE  │ │ NUTRITION SERVICE│ │ ANALYTICS SERVICE│
-        │                 │ │                 │ │                 │
-        │ • Crop Profiles │ │ • User Trackers │ │ • ML Models     │
-        │ • Harvest Data  │ │ • Meal Sources  │ │ • Predictions   │
-        │ • Soil Analysis │ │ • BMI Analysis  │ │ • Correlations  │
-        │ • Sustainability│ │ • Health Goals  │ │ • Insights      │
-        └─────────────────┘ └─────────────────┘ └─────────────────┘
+        │                 │ │                  │ │                  │
+        │ • Crop Profiles │ │ • User Trackers  │ │ • ML Models      │
+        │ • Harvest Data  │ │ • Meal Sources   │ │ • Predictions    │
+        │ • Soil Analysis │ │ • BMI Analysis   │ │ • Correlations   │
+        │ • Sustainability│ │ • Health Goals   │ │ • Insights       │
+        └─────────────────┘ └──────────────────┘ └──────────────────┘
                     │                 │                 │
                     ▼                 ▼                 ▼
-        ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
-        │  CROP DATABASE  │ │NUTRITION DATABASE│ │ANALYTICS DATABASE│
-        │  (PostgreSQL)   │ │  (PostgreSQL)   │ │  (InfluxDB)     │
-        └─────────────────┘ └─────────────────┘ └─────────────────┘
+        ┌─────────────────┐ ┌──────────────────┐ ┌───────────────────┐
+        │  CROP DATABASE  │ │NUTRITION DATABASE│ │ANALYTICS DATABASE │
+        │  (PostgreSQL)   │ │  (PostgreSQL)    │ │  (InfluxDB)       │
+        └─────────────────┘ └──────────────────┘ └───────────────────┘
 
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                           SUPPORTING SERVICES                                  │
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                           SUPPORTING SERVICES                                 │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐              │
 │  │   MESSAGE   │ │   CACHING   │ │  EXTERNAL   │ │ NOTIFICATION│              │
 │  │   BROKER    │ │   LAYER     │ │    APIS     │ │   SERVICE   │              │
@@ -1062,7 +1062,7 @@ mvn clean test jacoco:check spotbugs:check checkstyle:check
 │  │ • Event     │ │ • In-Memory │ │ • IoT       │ │ • Webhooks  │              │
 │  │   Streaming │ │   Caching   │ │   Sensors   │ │             │              │
 │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘              │
-└─────────────────────────────────────────────────────────────────────────────────┘
+└───────────────────────────────────────────────────────────────────────────────┘
 ```
 
 **Key Benefits:**
@@ -1075,15 +1075,15 @@ mvn clean test jacoco:check spotbugs:check checkstyle:check
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                           EVENT STREAMING PLATFORM                             │
-│                              (Apache Kafka)                                    │
+│                           EVENT STREAMING PLATFORM                              │
+│                              (Apache Kafka)                                     │
 │                                                                                 │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │                              TOPICS                                         ││
 │  │                                                                             ││
-│  │  • crop-events        • nutrition-events      • weather-events             ││
-│  │  • harvest-events     • meal-events           • health-events              ││
-│  │  • analytics-events   • notification-events   • iot-sensor-events          ││
+│  │  • crop-events        • nutrition-events      • weather-events              ││
+│  │  • harvest-events     • meal-events           • health-events               ││
+│  │  • analytics-events   • notification-events   • iot-sensor-events           ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────┬───────────────────────────────────────┘
                                           │
@@ -1111,28 +1111,28 @@ mvn clean test jacoco:check spotbugs:check checkstyle:check
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              ML PIPELINE                                       │
+│                              ML PIPELINE                                        │
 │                                                                                 │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
-│  │    DATA     │    │    DATA     │    │   FEATURE   │    │   MODEL     │     │
-│  │ INGESTION   │───▶│ PROCESSING  │───▶│ ENGINEERING │───▶│  TRAINING   │     │
-│  │             │    │             │    │             │    │             │     │
-│  │ • API Data  │    │ • Cleaning  │    │ • Selection │    │ • Crop Yield│     │
-│  │ • IoT Data  │    │ • Validation│    │ • Transform │    │ • Nutrition │     │
-│  │ • Weather   │    │ • Enrichment│    │ • Scaling   │    │ • Health    │     │
-│  │ • External  │    │ • Filtering │    │ • Encoding  │    │ • Prediction│     │
-│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘     │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐       │
+│  │    DATA     │    │    DATA     │    │   FEATURE   │    │   MODEL     │       │
+│  │ INGESTION   │───▶│ PROCESSING  │───▶│ ENGINEERING │───▶│  TRAINING   │       │
+│  │             │    │             │    │             │    │             │       │
+│  │ • API Data  │    │ • Cleaning  │    │ • Selection │    │ • Crop Yield│       │
+│  │ • IoT Data  │    │ • Validation│    │ • Transform │    │ • Nutrition │       │
+│  │ • Weather   │    │ • Enrichment│    │ • Scaling   │    │ • Health    │       │
+│  │ • External  │    │ • Filtering │    │ • Encoding  │    │ • Prediction│       │
+│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘       │
 │                                                                   │             │
 │                                                                   ▼             │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
-│  │   MODEL     │    │  REAL-TIME  │    │   BATCH     │    │    A/B      │     │
-│  │  SERVING    │◀───│  INFERENCE  │    │ INFERENCE   │    │  TESTING    │     │
-│  │             │    │             │    │             │    │             │     │
-│  │ • API       │    │ • Stream    │    │ • Daily     │    │ • Model     │     │
-│  │   Endpoints │    │   Processing│    │   Reports   │    │   Comparison│     │
-│  │ • Predictions│    │ • Real-time │    │ • Analytics │    │ • Performance│    │
-│  │ • Recommendations│ │   Alerts   │    │   Updates   │    │   Monitoring│     │
-│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘     │
+│  ┌──────────────────┐    ┌─────────────┐    ┌─────────────┐    ┌──────────────┐ │
+│  │   MODEL          │    │  REAL-TIME  │    │   BATCH     │    │    A/B       │ │
+│  │  SERVING         │◀───│  INFERENCE  │    │ INFERENCE   │    │  TESTING     │ │
+│  │                  │    │             │    │             │    │              │ │
+│  │ • API            │    │ • Stream    │    │ • Daily     │    │ • Model      │ │
+│  │   Endpoints.     │    │   Processing│    │   Reports   │    │   Comparison │ │
+│  │ • Predictions.   │    │ • Real-time │    │ • Analytics │    │ • Performance│ │
+│  │ • Recommendations│    │   Alerts    │    │   Updates   │    │   Monitoring │ │
+│  └──────────────────┘    └─────────────┘    └─────────────┘    └──────────────┘ │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1150,29 +1150,29 @@ mvn clean test jacoco:check spotbugs:check checkstyle:check
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                            KUBERNETES CLUSTER                                  │
+│                            KUBERNETES CLUSTER                                   │
 │                                                                                 │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │                         INGRESS CONTROLLER                                  ││
-│  │                    (NGINX, Traefik, Istio)                                 ││
+│  │                    (NGINX, Traefik, Istio)                                  ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 │                                                                                 │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐              │
-│  │    CROP     │ │  NUTRITION  │ │  ANALYTICS  │ │   GATEWAY   │              │
-│  │   SERVICE   │ │   SERVICE   │ │   SERVICE   │ │   SERVICE   │              │
-│  │             │ │             │ │             │ │             │              │
-│  │ Replicas: 3 │ │ Replicas: 2 │ │ Replicas: 2 │ │ Replicas: 2 │              │
-│  │ CPU: 500m   │ │ CPU: 300m   │ │ CPU: 1000m  │ │ CPU: 200m   │              │
-│  │ Memory: 1Gi │ │ Memory: 512Mi│ │ Memory: 2Gi │ │ Memory: 256Mi│             │
-│  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘              │
+│  ┌─────────────┐ ┌──────────────┐ ┌─────────────┐ ┌──────────────┐              │
+│  │    CROP     │ │  NUTRITION   │ │  ANALYTICS  │ │   GATEWAY    │              │
+│  │   SERVICE   │ │   SERVICE    │ │   SERVICE   │ │   SERVICE    │              │
+│  │             │ │              │ │             │ │              │              │
+│  │ Replicas: 3 │ │ Replicas: 2  │ │ Replicas: 2 │ │ Replicas: 2  │              │
+│  │ CPU: 500m   │ │ CPU: 300m    │ │ CPU: 1000m  │ │ CPU: 200m    │              │
+│  │ Memory: 1G  │ │ Memory: 512M │ │ Memory: 2G  │ │ Memory: 256Mi│              │
+│  └─────────────┘ └──────────────┘ └─────────────┘ └──────────────┘              │
 │                                                                                 │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │                         PERSISTENT STORAGE                                  ││
-│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐          ││
-│  │  │ PostgreSQL  │ │   Redis     │ │   Kafka     │ │  InfluxDB   │          ││
-│  │  │   Cluster   │ │   Cluster   │ │   Cluster   │ │ (Time Series│          ││
-│  │  │             │ │             │ │             │ │  Database)  │          ││
-│  │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘          ││
+│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐            ││
+│  │  │ PostgreSQL  │ │   Redis     │ │   Kafka     │ │  InfluxDB   │            ││
+│  │  │   Cluster   │ │   Cluster   │ │   Cluster   │ │ (Time Series│            ││
+│  │  │             │ │             │ │             │ │  Database)  │            ││
+│  │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘            ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -1187,28 +1187,28 @@ mvn clean test jacoco:check spotbugs:check checkstyle:check
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              CI/CD PIPELINE                                    │
+│                              CI/CD PIPELINE                                     │
 │                                                                                 │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
-│  │   SOURCE    │    │    BUILD    │    │    TEST     │    │   DEPLOY    │     │
-│  │   CONTROL   │───▶│             │───▶│             │───▶│             │     │
-│  │             │    │             │    │             │    │             │     │
-│  │ • Git       │    │ • Maven     │    │ • Unit      │    │ • Dev       │     │
-│  │ • GitHub    │    │ • Docker    │    │ • Integration│    │ • Staging   │     │
-│  │ • Branches  │    │ • Compile   │    │ • Load      │    │ • Production│     │
-│  │ • Pull Req  │    │ • Package   │    │ • Security  │    │ • Blue/Green│     │
-│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘     │
+│  ┌─────────────┐    ┌─────────────┐    ┌──────────────┐    ┌─────────────┐      │
+│  │   SOURCE    │    │    BUILD    │    │    TEST      │    │   DEPLOY    │      │
+│  │   CONTROL   │───▶│             │───▶│              │───▶│             │      │
+│  │             │    │             │    │              │    │             │      │
+│  │ • Git       │    │ • Maven     │    │ • Unit       │    │ • Dev       │      │
+│  │ • GitHub    │    │ • Docker    │    │ • Integration│    │ • Staging   │      │
+│  │ • Branches  │    │ • Compile   │    │ • Load       │    │ • Production│      │
+│  │ • Pull Req  │    │ • Package   │    │ • Security   │    │ • Blue/Green│      │
+│  └─────────────┘    └─────────────┘    └──────────────┘    └─────────────┘      │
 │                                                                   │             │
 │                                                                   ▼             │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
-│  │  MONITORING │    │   LOGGING   │    │  ALERTING   │    │   ROLLBACK  │     │
-│  │             │◀───│             │◀───│             │◀───│             │     │
-│  │             │    │             │    │             │    │             │     │
-│  │ • Prometheus│    │ • ELK Stack │    │ • PagerDuty │    │ • Automatic │     │
-│  │ • Grafana   │    │ • Fluentd   │    │ • Slack     │    │ • Manual    │     │
-│  │ • Metrics   │    │ • Centralized│    │ • Email     │    │ • Canary    │     │
-│  │ • Dashboards│    │   Logs      │    │ • SMS       │    │ • Rollforward│    │
-│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘     │
+│  ┌─────────────┐    ┌──────────────┐    ┌─────────────┐    ┌──────────────┐     │
+│  │  MONITORING │    │    LOGGING   │    │  ALERTING   │    │   ROLLBACK   │     │
+│  │             │◀───│              │◀───│             │◀───│              │     │
+│  │             │    │              │    │             │    │              │     │
+│  │ • Prometheus│    │ • ELK Stack  │    │ • PagerDuty │    │ • Automatic  │     │
+│  │ • Grafana   │    │ • Fluentd    │    │ • Slack     │    │ • Manual     │     │
+│  │ • Metrics   │    │ • Centralized│    │ • Email     │    │ • Canary     │     │
+│  │ • Dashboards│    │   Logs       │    │ • SMS       │    │ • Rollforward│     │
+│  └─────────────┘    └──────────────┘    └─────────────┘    └──────────────┘     │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1226,29 +1226,29 @@ mvn clean test jacoco:check spotbugs:check checkstyle:check
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              SECURITY LAYERS                                   │
+│                              SECURITY LAYERS                                    │
 │                                                                                 │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │                         NETWORK SECURITY                                    ││
-│  │  • HTTPS/TLS 1.3  • VPN Access  • Firewall Rules  • DDoS Protection      ││
+│  │  • HTTPS/TLS 1.3  • VPN Access  • Firewall Rules  • DDoS Protection         ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 │                                       │                                         │
 │                                       ▼                                         │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │                      API GATEWAY SECURITY                                   ││
-│  │  • JWT Authentication  • OAuth 2.0  • Rate Limiting  • Input Validation   ││
+│  │  • JWT Authentication  • OAuth 2.0  • Rate Limiting  • Input Validation     ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 │                                       │                                         │
 │                                       ▼                                         │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │                     APPLICATION SECURITY                                    ││
-│  │  • RBAC  • Data Encryption  • Audit Logging  • Secure Coding Practices   ││
+│  │  • RBAC  • Data Encryption  • Audit Logging  • Secure Coding Practices      ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 │                                       │                                         │
 │                                       ▼                                         │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │                       DATABASE SECURITY                                     ││
-│  │  • Encryption at Rest  • Connection Security  • Access Controls  • Backup ││
+│  │  • Encryption at Rest  • Connection Security  • Access Controls  • Backup   ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -1257,23 +1257,23 @@ mvn clean test jacoco:check spotbugs:check checkstyle:check
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                           PERFORMANCE LAYERS                                   │
+│                           PERFORMANCE LAYERS                                    │
 │                                                                                 │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │                          CACHING LAYER                                      ││
-│  │  • CDN  • API Gateway Cache  • Redis  • Application Cache  • Database Cache││
+│  │  • CDN  • API Gateway Cache  • Redis  • Application Cache  • Database Cache ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 │                                       │                                         │
 │                                       ▼                                         │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │                       LOAD BALANCING                                        ││
-│  │  • Geographic  • Round Robin  • Least Connections  • Health-based Routing ││
+│  │  • Geographic  • Round Robin  • Least Connections  • Health-based Routing   ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 │                                       │                                         │
 │                                       ▼                                         │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │                      DATABASE OPTIMIZATION                                  ││
-│  │  • Indexing  • Query Optimization  • Connection Pooling  • Read Replicas  ││
+│  │  • Indexing  • Query Optimization  • Connection Pooling  • Read Replicas    ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -1286,41 +1286,41 @@ mvn clean test jacoco:check spotbugs:check checkstyle:check
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                            OBSERVABILITY PLATFORM                              │
+│                            OBSERVABILITY PLATFORM                               │
 │                                                                                 │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │                              METRICS                                        ││
-│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐          ││
-│  │  │ Prometheus  │ │   Grafana   │ │   Custom    │ │  Business   │          ││
-│  │  │             │ │             │ │   Metrics   │ │   Metrics   │          ││
-│  │  │ • System    │ │ • Dashboards│ │ • API       │ │ • User      │          ││
-│  │  │ • Application│ │ • Alerts   │ │ • Database  │ │ • Revenue   │          ││
-│  │  │ • Infrastructure│ │ • Reports│ │ • Custom   │ │ • Growth    │          ││
-│  │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘          ││
+│  │  ┌─────────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐        ││
+│  │  │ Prometheus      │ │   Grafana   │ │   Custom    │ │  Business   │        ││
+│  │  │                 │ │             │ │   Metrics   │ │   Metrics   │        ││
+│  │  │ • System        │ │ • Dashboards│ │ • API       │ │ • User      │        ││
+│  │  │ • Application.  │ │ • Alerts    │ │ • Database  │ │ • Revenue   │        ││
+│  │  │ • Infrastructure│ │ • Reports.  │ │ • Custom    │ │ • Growth    │        ││
+│  │  └─────────────────┘ └─────────────┘ └─────────────┘ └─────────────┘        ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 │                                       │                                         │
 │                                       ▼                                         │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │                               LOGGING                                       ││
-│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐          ││
-│  │  │ Elasticsearch│ │   Logstash  │ │   Kibana    │ │   Fluentd   │          ││
-│  │  │             │ │             │ │             │ │             │          ││
-│  │  │ • Storage   │ │ • Processing│ │ • Visualization│ • Collection│          ││
-│  │  │ • Search    │ │ • Parsing   │ │ • Analysis  │ • Routing   │          ││
-│  │  │ • Indexing  │ │ • Filtering │ │ • Dashboards│ • Buffering │          ││
-│  │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘          ││
+│  │  ┌──────────────┐ ┌─────────────┐ ┌────────────────┐ ┌─────────────┐        ││
+│  │  │ Elasticsearch│ │   Logstash  │ │   Kibana       │ │   Fluentd   │        ││
+│  │  │              │ │             │ │                │ │             │        ││
+│  │  │ • Storage    │ │ • Processing│ │ • Visualization│ | • Collection│        ││
+│  │  │ • Search     │ │ • Parsing   │ │ • Analysis     │ | • Routing   │        ││
+│  │  │ • Indexing   │ │ • Filtering │ │ • Dashboards.  │ | • Buffering │        ││
+│  │  └──────────────┘ └─────────────┘ └────────────────┘ └─────────────┘        ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 │                                       │                                         │
 │                                       ▼                                         │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │                              TRACING                                        ││
-│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐          ││
-│  │  │   Jaeger    │ │   Zipkin    │ │ OpenTelemetry│ │   Custom    │          ││
-│  │  │             │ │             │ │             │ │   Tracing   │          ││
-│  │  │ • Distributed│ • Trace     │ • Standards │ • Business  │          ││
-│  │  │   Tracing   │ │   Analysis  │ • Collection│ • Logic     │          ││
-│  │  │ • Performance│ • Latency   │ • Export    │ • Correlation│          ││
-│  │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘          ││
+│  │  ┌──────────────┐ ┌─────────────┐ ┌──────────────┐ ┌──────────────┐         ││
+│  │  │   Jaeger     │ │   Zipkin    │ │ OpenTelemetry│ │   Custom     │         ││
+│  │  │              │ │             │ │              │ │   Tracing    │         ││
+│  │  │ • Distributed│ | • Trace     │ | • Standards  │ | • Business   │         ││
+│  │  │   Tracing    │ │   Analysis  │ | • Collection │ | • Logic      │         ││
+│  │  │ • Performance│ | • Latency   │ | • Export     │ | • Correlation│         ││
+│  │  └──────────────┘ └─────────────┘ └──────────────┘ └──────────────┘         ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
