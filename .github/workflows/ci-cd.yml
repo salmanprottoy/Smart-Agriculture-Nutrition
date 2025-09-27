@@ -52,7 +52,7 @@ jobs:
           DB_PASSWORD: test_password
 
       - name: Skip integration tests (API not deployed in CI)
-        run: mvn verify -DskipITs
+        run: mvn verify -DskipITs -Djacoco.skip=true
         env:
           DB_HOST: localhost
           DB_PORT: 5432
