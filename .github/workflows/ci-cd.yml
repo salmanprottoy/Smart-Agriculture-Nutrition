@@ -1,160 +1,163 @@
 name: Smart Agriculture Nutrition - CI/CD Pipeline
 
 on:
-    push:
-        branches: [main, develop]
-    pull_request:
-        branches: [main]
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest
 
-        services:
-            postgres:
-                image: postgres:15-alpine
-                env:
-                    POSTGRES_DB: smart_agriculture_nutrition_test
-                    POSTGRES_USER: agriculture_user
-                    POSTGRES_PASSWORD: test_password
-                options: >-
-                    --health-cmd pg_isready
-                    --health-interval 10s
-                    --health-timeout 5s
-                    --health-retries 5
-                ports:
-                    - 5432:5432
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: smart_agriculture_nutrition_test
+          POSTGRES_USER: agriculture_user
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Set up JDK 17
-              uses: actions/setup-java@v4
-              with:
-                  java-version: "17"
-                  distribution: "temurin"
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
 
-            - name: Cache Maven dependencies
-              uses: actions/cache@v3
-              with:
-                  path: ~/.m2
-                  key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-                  restore-keys: ${{ runner.os }}-m2
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
 
-            - name: Run tests
-              run: mvn clean test
-              env:
-                  DB_HOST: localhost
-                  DB_PORT: 5432
-                  DB_NAME: smart_agriculture_nutrition_test
-                  DB_USER: agriculture_user
-                  DB_PASSWORD: test_password
+      - name: Run tests
+        run: mvn clean test
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: smart_agriculture_nutrition_test
+          DB_USER: agriculture_user
+          DB_PASSWORD: test_password
 
-            - name: Run integration tests
-              run: mvn verify -P integration-tests
-              env:
-                  DB_HOST: localhost
-                  DB_PORT: 5432
-                  DB_NAME: smart_agriculture_nutrition_test
-                  DB_USER: agriculture_user
-                  DB_PASSWORD: test_password
+      - name: Run integration tests
+        run: mvn verify -P integration-tests
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: smart_agriculture_nutrition_test
+          DB_USER: agriculture_user
+          DB_PASSWORD: test_password
 
-            - name: Generate test report
-              uses: dorny/test-reporter@v1
-              if: success() || failure()
-              with:
-                  name: Maven Tests
-                  path: target/surefire-reports/*.xml
-                  reporter: java-junit
+      - name: Display test results
+        if: always()
+        run: |
+          echo "=== Test Results ==="
+          if [ -d "target/surefire-reports" ]; then
+            echo "✅ Tests completed"
+            find target/surefire-reports -name "*.xml" -exec echo "Found test report: {}" \;
+          else
+            echo "❌ No test reports found"
+          fi
 
-    build:
-        needs: test
-        runs-on: ubuntu-latest
+  build:
+    needs: test
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Set up JDK 17
-              uses: actions/setup-java@v4
-              with:
-                  java-version: "17"
-                  distribution: "temurin"
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
 
-            - name: Cache Maven dependencies
-              uses: actions/cache@v3
-              with:
-                  path: ~/.m2
-                  key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-                  restore-keys: ${{ runner.os }}-m2
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
 
-            - name: Build application
-              run: mvn clean package -DskipTests
+      - name: Build application
+        run: mvn clean package -DskipTests
 
-            - name: Build Docker image
-              run: docker build -t smart-agriculture-nutrition:${{ github.sha }} .
+      - name: Build Docker image
+        run: docker build -t smart-agriculture-nutrition:${{ github.sha }} .
 
-            - name: Save Docker image
-              run: docker save smart-agriculture-nutrition:${{ github.sha }} | gzip > smart-agriculture-nutrition.tar.gz
+      - name: Save Docker image
+        run: docker save smart-agriculture-nutrition:${{ github.sha }} | gzip > smart-agriculture-nutrition.tar.gz
 
-            - name: Upload build artifacts
-              uses: actions/upload-artifact@v3
-              with:
-                  name: application-artifacts
-                  path: |
-                      target/*.war
-                      smart-agriculture-nutrition.tar.gz
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: application-artifacts
+          path: |
+            target/*.war
+            smart-agriculture-nutrition.tar.gz
 
-    deploy-demo:
-        needs: build
-        runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/main'
+  deploy-demo:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Download build artifacts
-              uses: actions/download-artifact@v3
-              with:
-                  name: application-artifacts
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: application-artifacts
 
-            - name: Load Docker image
-              run: docker load < smart-agriculture-nutrition.tar.gz
+      - name: Load Docker image
+        run: docker load < smart-agriculture-nutrition.tar.gz
 
-            - name: Start demo environment
-              run: |
-                  docker-compose -f docker-compose.prod.yml up -d
-                  sleep 30  # Wait for services to start
+      - name: Start demo environment
+        run: |
+          docker-compose -f docker-compose.prod.yml up -d
+          sleep 30  # Wait for services to start
 
-            - name: Health check
-              run: |
-                  curl -f http://localhost:8080/SmartAgricultureNutrition/api/v1/crops || exit 1
-                  echo "✅ Application is healthy!"
+      - name: Health check
+        run: |
+          curl -f http://localhost:8080/SmartAgricultureNutrition/api/v1/crops || exit 1
+          echo "✅ Application is healthy!"
 
-            - name: Run API tests
-              run: |
-                  # Test main endpoints
-                  curl -f http://localhost:8080/SmartAgricultureNutrition/api/v1/crops
-                  curl -f http://localhost:8080/SmartAgricultureNutrition/api/v1/nutrition-data
-                  curl -f http://localhost:8080/SmartAgricultureNutrition/api/v1/personal-nutrition-tracker
-                  echo "✅ All API endpoints are working!"
+      - name: Run API tests
+        run: |
+          # Test main endpoints
+          curl -f http://localhost:8080/SmartAgricultureNutrition/api/v1/crops
+          curl -f http://localhost:8080/SmartAgricultureNutrition/api/v1/nutrition-data
+          curl -f http://localhost:8080/SmartAgricultureNutrition/api/v1/personal-nutrition-tracker
+          echo "✅ All API endpoints are working!"
 
-            - name: Generate deployment report
-              run: |
-                  echo "# Deployment Report" > deployment-report.md
-                  echo "- **Build**: ${{ github.sha }}" >> deployment-report.md
-                  echo "- **Status**: ✅ Successful" >> deployment-report.md
-                  echo "- **Date**: $(date)" >> deployment-report.md
-                  echo "- **API Health**: ✅ All endpoints responding" >> deployment-report.md
+      - name: Generate deployment report
+        run: |
+          echo "# Deployment Report" > deployment-report.md
+          echo "- **Build**: ${{ github.sha }}" >> deployment-report.md
+          echo "- **Status**: ✅ Successful" >> deployment-report.md
+          echo "- **Date**: $(date)" >> deployment-report.md
+          echo "- **API Health**: ✅ All endpoints responding" >> deployment-report.md
 
-            - name: Upload deployment report
-              uses: actions/upload-artifact@v3
-              with:
-                  name: deployment-report
-                  path: deployment-report.md
+      - name: Upload deployment report
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-report
+          path: deployment-report.md
 
-            - name: Cleanup
-              if: always()
-              run: docker-compose -f docker-compose.prod.yml down -v
+      - name: Cleanup
+        if: always()
+        run: docker-compose -f docker-compose.prod.yml down -v
