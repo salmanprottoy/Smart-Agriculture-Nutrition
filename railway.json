@@ -1,0 +1,8 @@
+{
+  "build": {
+    "builder": "dockerfile"
+  },
+  "deploy": {
+    "startCommand": "docker-compose -f docker-compose.prod.yml up -d && tail -f /dev/null"
+  }
+}
