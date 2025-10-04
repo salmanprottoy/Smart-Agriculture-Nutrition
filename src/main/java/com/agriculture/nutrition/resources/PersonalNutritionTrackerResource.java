@@ -17,7 +17,7 @@ import javax.ws.rs.core.*;
 import java.net.URI;
 import java.util.List;
 
-@Path("/nutrition-trackers")
+@Path("/personal-nutrition-trackers")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "Personal Nutrition Trackers", description = "Personal nutrition tracking and health goal management")
