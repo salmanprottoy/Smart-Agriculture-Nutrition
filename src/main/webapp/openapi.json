@@ -259,7 +259,7 @@
         }
       }
     },
-    "/personal-nutrition-trackers": {
+    "/nutrition-trackers": {
       "get": {
         "tags": ["Personal Nutrition Trackers"],
         "summary": "Get all nutrition trackers",
@@ -324,7 +324,7 @@
         }
       }
     },
-    "/personal-nutrition-trackers/{trackerId}": {
+    "/nutrition-trackers/{trackerId}": {
       "get": {
         "tags": ["Personal Nutrition Trackers"],
         "summary": "Get specific nutrition tracker",
@@ -405,7 +405,7 @@
         }
       }
     },
-    "/personal-nutrition-trackers/{trackerId}/meal-sources": {
+    "/nutrition-trackers/{trackerId}/meal-sources": {
       "get": {
         "tags": ["Personal Nutrition Trackers"],
         "summary": "Get meal sources for tracker",
@@ -480,7 +480,7 @@
         }
       }
     },
-    "/personal-nutrition-trackers/{trackerId}/health-correlations": {
+    "/nutrition-trackers/{trackerId}/health-correlations": {
       "get": {
         "tags": ["Personal Nutrition Trackers"],
         "summary": "Get health correlations for tracker",
@@ -511,7 +511,7 @@
         }
       }
     },
-    "/personal-nutrition-trackers/{trackerId}/bmi-analysis": {
+    "/nutrition-trackers/{trackerId}/bmi-analysis": {
       "get": {
         "tags": ["Personal Nutrition Trackers"],
         "summary": "Get BMI analysis for tracker",

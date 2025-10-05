@@ -87,7 +87,7 @@ public class SwaggerUIResource {
 				    <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js"></script>
 				    <script>
 				    window.onload = function() {
-				        const ui = SwaggerUIBundle({
+                        const ui = SwaggerUIBundle({
 				            url: '/SmartAgricultureNutrition/openapi.json',
 				            dom_id: '#swagger-ui',
 				            deepLinking: true,
@@ -245,10 +245,10 @@ public class SwaggerUIResource {
 				                }
 				            }
 				        },
-				        "/nutrition-trackers": {
-				            "get": {
-				                "tags": ["Personal Nutrition Trackers"],
-				                "summary": "Get all nutrition trackers",
+                        "/nutrition-trackers": {
+                            "get": {
+                                "tags": ["Personal Nutrition Trackers"],
+                                "summary": "Get all nutrition trackers",
 				                "description": "Retrieve personal nutrition trackers with BMI integration and health goal tracking",
 				                "responses": {
 				                    "200": {

@@ -184,13 +184,13 @@ public class OpenApiResource {
 		paths.append("    },\n");
 
 		// Personal Nutrition Trackers
-		paths.append("    \"/personal-nutrition-trackers\": {\n");
+		paths.append("    \"/nutrition-trackers\": {\n");
 		paths.append("      \"get\": {\n");
 		paths.append("        \"tags\": [\"Personal Nutrition Trackers\"],\n");
-		paths.append("        \"summary\": \"Get all personal nutrition trackers\",\n");
+		paths.append("        \"summary\": \"Get all nutrition trackers\",\n");
 		paths.append("        \"responses\": {\n");
 		paths.append("          \"200\": {\n");
-		paths.append("            \"description\": \"List of personal nutrition trackers\"\n");
+		paths.append("            \"description\": \"List of nutrition trackers\"\n");
 		paths.append("          }\n");
 		paths.append("        }\n");
 		paths.append("      }\n");
@@ -210,10 +210,10 @@ public class OpenApiResource {
 				+ "        \"summary\": \"Get all crop nutrition profiles\",\n" + "        \"responses\": {\n"
 				+ "          \"200\": {\n" + "            \"description\": \"List of crop nutrition profiles\"\n"
 				+ "          }\n" + "        }\n" + "      }\n" + "    },\n"
-				+ "    \"/personal-nutrition-trackers\": {\n" + "      \"get\": {\n"
+				+ "    \"/nutrition-trackers\": {\n" + "      \"get\": {\n"
 				+ "        \"tags\": [\"Personal Nutrition Trackers\"],\n"
-				+ "        \"summary\": \"Get all personal nutrition trackers\",\n" + "        \"responses\": {\n"
-				+ "          \"200\": {\n" + "            \"description\": \"List of personal nutrition trackers\"\n"
+				+ "        \"summary\": \"Get all nutrition trackers\",\n" + "        \"responses\": {\n"
+				+ "          \"200\": {\n" + "            \"description\": \"List of nutrition trackers\"\n"
 				+ "          }\n" + "        }\n" + "      }\n" + "    }\n" + "  },\n" + "  \"components\": {\n"
 				+ "    \"schemas\": {}\n" + "  }\n" + "}";
 	}
