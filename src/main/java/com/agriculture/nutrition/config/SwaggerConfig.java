@@ -3,19 +3,36 @@ package com.agriculture.nutrition.config;
 import com.agriculture.nutrition.resources.PersonalNutritionTrackerResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import javax.ws.rs.ApplicationPath;
+import javax.annotation.security.DeclareRoles;
 import javax.ws.rs.core.Application;
 
 /**
  * Swagger/OpenAPI configuration for Smart Agriculture Nutrition Provides
  * comprehensive API documentation with interactive testing capabilities
  */
+@SecurityScheme(
+        name = "basicAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "basic",
+        in = SecuritySchemeIn.HEADER
+)
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT",
+        in = SecuritySchemeIn.HEADER
+)
+@DeclareRoles({"USER", "ADMIN"})
 @OpenAPIDefinition(info = @Info(title = "Smart Agriculture Nutrition", version = "1.0.0", description = "REST API connecting smart agriculture data with personal nutrition tracking. "
 		+ "This API bridges the gap between agricultural production and personal health outcomes, "
 		+ "creating a complete food-to-health ecosystem.", contact = @Contact(name = "Smart Agriculture Team", email = "agriculture@nutrition.com", url = "https://github.com/agriculture-nutrition/api"), license = @License(name = "MIT License", url = "https://opensource.org/licenses/MIT")), servers = {
