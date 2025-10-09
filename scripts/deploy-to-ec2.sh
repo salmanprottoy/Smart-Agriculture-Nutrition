@@ -124,9 +124,9 @@ DB_NAME=smart_agriculture_nutrition
 DB_USERNAME=agriculture_user
 DB_PASSWORD=AgriNutri2024SecurePass!
 
-# API Keys
-WEATHER_API_KEY=635fd9df515c45a087053736252609
-USDA_API_KEY=hEeis1khcuBekJ1ZDYFhNbXDUP69BFH9OrBcHRYW
+# API Keys - REPLACE WITH YOUR ACTUAL KEYS
+WEATHER_API_KEY=your_weather_api_key_here
+USDA_API_KEY=your_usda_api_key_here
 
 # JWT Secret
 JWT_SECRET=your-super-secure-jwt-secret-key-2024-change-this
