@@ -189,7 +189,40 @@ public class DatabaseConfig {
 	 * Load database URL from environment variables and .env files
 	 */
 	private String loadDatabaseUrl() {
-		// First try system environment
+		// First check for Railway's DATABASE_URL format
+		String railwayUrl = System.getenv("DATABASE_URL");
+		if (railwayUrl != null && !railwayUrl.trim().isEmpty()) {
+			// Railway provides: postgresql://user:pass@host:port/dbname
+			// Convert to JDBC format: jdbc:postgresql://host:port/dbname
+			if (railwayUrl.startsWith("postgres://")) {
+				railwayUrl = railwayUrl.replace("postgres://", "jdbc:postgresql://");
+			} else if (railwayUrl.startsWith("postgresql://")) {
+				railwayUrl = "jdbc:" + railwayUrl;
+			}
+			// Extract and remove credentials from URL as they'll be set separately
+			try {
+				java.net.URI uri = new java.net.URI(railwayUrl.replace("jdbc:", ""));
+				String userInfo = uri.getUserInfo();
+				if (userInfo != null) {
+					// Remove credentials from URL
+					railwayUrl = railwayUrl.replace(userInfo + "@", "");
+				}
+			} catch (Exception e) {
+				// Use URL as-is if parsing fails
+			}
+			return railwayUrl;
+		}
+		
+		// Check for Railway's individual PostgreSQL variables
+		String pgHost = System.getenv("PGHOST");
+		String pgPort = System.getenv("PGPORT");
+		String pgDatabase = System.getenv("PGDATABASE");
+		
+		if (pgHost != null && pgPort != null && pgDatabase != null) {
+			return String.format("jdbc:postgresql://%s:%s/%s", pgHost, pgPort, pgDatabase);
+		}
+		
+		// Then try standard environment variables
 		String host = System.getenv("DB_HOST");
 		String port = System.getenv("DB_PORT");
 		String name = System.getenv("DB_NAME");
@@ -242,8 +275,34 @@ public class DatabaseConfig {
 	 * Load database username from environment variables and .env files
 	 */
 	private String loadDatabaseUsername() {
-		// First try system environment
+		// First check for Railway's DATABASE_URL to extract username
+		String railwayUrl = System.getenv("DATABASE_URL");
+		if (railwayUrl != null && !railwayUrl.trim().isEmpty()) {
+			try {
+				// Extract username from postgresql://user:pass@host:port/dbname
+				String cleanUrl = railwayUrl.replace("postgres://", "").replace("postgresql://", "");
+				if (cleanUrl.contains("@")) {
+					String userInfo = cleanUrl.substring(0, cleanUrl.indexOf("@"));
+					if (userInfo.contains(":")) {
+						return userInfo.substring(0, userInfo.indexOf(":"));
+					}
+				}
+			} catch (Exception e) {
+				// Fall through to other methods
+			}
+		}
+		
+		// Check for Railway's PGUSER variable
+		String pgUser = System.getenv("PGUSER");
+		if (pgUser != null && !pgUser.trim().isEmpty()) {
+			return pgUser;
+		}
+		
+		// Then try standard DB_USERNAME or DB_USER
 		String username = System.getenv("DB_USERNAME");
+		if (username == null || username.trim().isEmpty()) {
+			username = System.getenv("DB_USER");
+		}
 		if (username != null && !username.trim().isEmpty()) {
 			return username;
 		}
@@ -284,7 +343,30 @@ public class DatabaseConfig {
 	 * Load database password from environment variables and .env files
 	 */
 	private String loadDatabasePassword() {
-		// First try system environment
+		// First check for Railway's DATABASE_URL to extract password
+		String railwayUrl = System.getenv("DATABASE_URL");
+		if (railwayUrl != null && !railwayUrl.trim().isEmpty()) {
+			try {
+				// Extract password from postgresql://user:pass@host:port/dbname
+				String cleanUrl = railwayUrl.replace("postgres://", "").replace("postgresql://", "");
+				if (cleanUrl.contains("@")) {
+					String userInfo = cleanUrl.substring(0, cleanUrl.indexOf("@"));
+					if (userInfo.contains(":")) {
+						return userInfo.substring(userInfo.indexOf(":") + 1);
+					}
+				}
+			} catch (Exception e) {
+				// Fall through to other methods
+			}
+		}
+		
+		// Check for Railway's PGPASSWORD variable
+		String pgPassword = System.getenv("PGPASSWORD");
+		if (pgPassword != null && !pgPassword.trim().isEmpty()) {
+			return pgPassword;
+		}
+		
+		// Then try standard DB_PASSWORD
 		String password = System.getenv("DB_PASSWORD");
 		if (password != null && !password.trim().isEmpty()) {
 			return password;
