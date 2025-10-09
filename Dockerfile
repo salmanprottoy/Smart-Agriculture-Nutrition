@@ -32,8 +32,9 @@ RUN mkdir -p /usr/local/tomcat/conf/agriculture
 COPY src/main/resources/application.properties /usr/local/tomcat/conf/agriculture/
 
 # Set environment variables
-ENV CATALINA_OPTS="-Xmx512m -Xms256m"
-ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
+# Fix for CGroup v2 issues in containerized environments
+ENV CATALINA_OPTS="-Xmx512m -Xms256m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djdk.internal.platform.cgroupv2.isMountInfoReliable=false"
 
 # Expose port
 EXPOSE 8080
