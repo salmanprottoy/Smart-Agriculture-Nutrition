@@ -193,7 +193,7 @@ sudo systemctl restart nginx
 Your API will be available at:
 - **Direct**: `http://your-ec2-public-ip:8080/SmartAgricultureNutrition/api/v1/`
 - **Via Nginx**: `http://your-ec2-public-ip/api/v1/`
-- **Swagger UI**: `http://your-ec2-public-ip/api/v1/swagger-ui`
+- **Swagger UI**: `http://your-ec2-public-ip/api/v1/swagger`
 
 ## Step 9: Setup Auto-start on Reboot
 

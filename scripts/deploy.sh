@@ -96,7 +96,7 @@ show_urls() {
     echo -e "  Port 80:   ${GREEN}http://${SERVER_IP}/SmartAgricultureNutrition/api/v1/${NC}"
     echo -e "  Port 8080: ${GREEN}http://${SERVER_IP}:8080/SmartAgricultureNutrition/api/v1/${NC}"
     echo ""
-    echo -e "  Swagger UI: ${GREEN}http://${SERVER_IP}/SmartAgricultureNutrition/api/v1/swagger-ui${NC}"
+    echo -e "  Swagger UI: ${GREEN}http://${SERVER_IP}/SmartAgricultureNutrition/api/v1/swagger${NC}"
     echo "========================================="
     echo ""
     echo -e "${YELLOW}Note: Make sure your firewall/security group allows ports 80 and 8080${NC}"
