@@ -26,11 +26,17 @@ public class SwaggerUIResource {
             <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js"></script>
             <script>
                 window.onload = function() {
+                    // Get the current URL base
+                    const baseUrl = window.location.protocol + '//' + window.location.host;
+                    const apiUrl = baseUrl + '/SmartAgricultureNutrition/api/v1/openapi.json';
+                    
                     SwaggerUIBundle({
-                        url: '/SmartAgricultureNutrition/api/v1/openapi.json',
+                        url: apiUrl,
                         dom_id: '#swagger-ui',
                         presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
-                        layout: "StandaloneLayout"
+                        layout: "StandaloneLayout",
+                        validatorUrl: null,
+                        tryItOutEnabled: true
                     });
                 };
             </script>
