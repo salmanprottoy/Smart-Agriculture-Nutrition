@@ -16,8 +16,8 @@ COPY src ./src
 # Build the application
 RUN mvn clean package -DskipTests
 
-# Production stage - Using a more stable Tomcat image
-FROM tomcat:9.0.62-jre17
+# Production stage - Using a stable Tomcat image
+FROM tomcat:9-jre17
 
 # Remove default webapps
 RUN rm -rf /usr/local/tomcat/webapps/*
