@@ -21,17 +21,39 @@ public class JwtService {
     }
 
     private SecretKey loadSecretKey() {
-        Dotenv dotenv = Dotenv.load();  // loads .env file and environment variables
-        String base64 = dotenv.get(SECRET_ENV);
+        // First try to get from system environment variables (for production/Railway)
+        String secret = System.getenv(SECRET_ENV);
+        
+        // If not found in environment, try to load from .env file (for local development)
+        if (secret == null || secret.isBlank()) {
+            try {
+                Dotenv dotenv = Dotenv.load();
+                secret = dotenv.get(SECRET_ENV);
+            } catch (Exception e) {
+                // .env file not found, continue with environment variable check
+                System.out.println("Note: .env file not found, using system environment variables");
+            }
+        }
 
-        if (base64 == null || base64.isBlank()) {
-            throw new RuntimeException("JWT_SECRET environment variable is not set or is empty");
+        if (secret == null || secret.isBlank()) {
+            // Use a default key for development if JWT_SECRET is not set
+            System.out.println("WARNING: JWT_SECRET not set, using default development key");
+            secret = "dGhpcy1pcy1hLWRlZmF1bHQtZGV2ZWxvcG1lbnQta2V5LWZvci10ZXN0aW5nLW9ubHk="; // base64 encoded default key
         }
 
         try {
-            return Keys.hmacShaKeyFor(Base64.getDecoder().decode(base64));
+            // Check if it's base64 encoded
+            return Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret));
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid JWT_SECRET: must be a valid base64-encoded key", e);
+            // If not base64, use the string directly (but ensure it's at least 256 bits)
+            byte[] keyBytes = secret.getBytes();
+            if (keyBytes.length < 32) {
+                // Pad the key to 32 bytes if it's too short
+                byte[] paddedKey = new byte[32];
+                System.arraycopy(keyBytes, 0, paddedKey, 0, Math.min(keyBytes.length, 32));
+                return Keys.hmacShaKeyFor(paddedKey);
+            }
+            return Keys.hmacShaKeyFor(keyBytes);
         }
     }
 
