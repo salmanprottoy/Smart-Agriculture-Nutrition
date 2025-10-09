@@ -16,8 +16,8 @@ COPY src ./src
 # Build the application
 RUN mvn clean package -DskipTests
 
-# Production stage
-FROM tomcat:9.0-jdk17-openjdk-slim
+# Production stage - Using a more stable Tomcat image
+FROM tomcat:9.0.62-jre17
 
 # Remove default webapps
 RUN rm -rf /usr/local/tomcat/webapps/*
@@ -31,14 +31,15 @@ RUN mkdir -p /usr/local/tomcat/conf/agriculture
 # Copy application properties
 COPY src/main/resources/application.properties /usr/local/tomcat/conf/agriculture/
 
-# Set environment variables
-# Fix for CGroup v2 issues in containerized environments
-ENV CATALINA_OPTS="-Xmx512m -Xms256m"
-ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djdk.tls.client.protocols=TLSv1.2 -Dcom.sun.management.jmxremote=false"
+# Disable JMX to avoid startup issues
+RUN echo "org.apache.catalina.mbeans.JmxRemoteLifecycleListener.skip=true" >> /usr/local/tomcat/conf/catalina.properties
+
+# Set environment variables - minimal configuration
+ENV CATALINA_OPTS="-Xmx512m -Xms256m -Dfile.encoding=UTF-8"
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
 
 # Expose port
 EXPOSE 8080
-
 
 # Start Tomcat
 CMD ["catalina.sh", "run"]
