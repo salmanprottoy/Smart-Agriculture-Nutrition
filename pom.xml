@@ -206,7 +206,7 @@
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-binding</artifactId>
         </dependency>
-        
+
         <dependency>
            <groupId>org.json</groupId>
            <artifactId>json</artifactId>
@@ -259,7 +259,44 @@
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
         </dependency>
-        
+
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+
+        <!-- JJWT core library -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>java-dotenv</artifactId>
+            <version>5.2.2</version>
+        </dependency>
+
+
+        <!-- JJWT implementation (signing, parsing, etc.) -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- JSON serializer for JWT payloads -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+
+
         <!-- Apache HTTP Client for better HTTP handling -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
