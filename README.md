@@ -1,423 +1,218 @@
-# 🌱 Smart Agriculture Nutrition
+# 🌱 Smart Agriculture Nutrition API
 
-> **From Farm to Fork to Fitness** - A comprehensive REST API connecting smart agriculture data with personal nutrition tracking, creating a complete food-to-health ecosystem.
+> **From Farm to Fork to Fitness** - A comprehensive REST API connecting smart agriculture data with personal nutrition tracking.
 
-[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
-[![Maven](https://img.shields.io/badge/Maven-3.6+-blue.svg)](https://maven.apache.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://www.postgresql.org/)
+[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.java.net/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)](https://docs.docker.com/compose/)
-[![JAX-RS](https://img.shields.io/badge/JAX--RS-3.1-green.svg)](https://jakarta.ee/specifications/restful-ws/)
-[![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-green.svg)](https://swagger.io/specification/)
+[![AWS](https://img.shields.io/badge/AWS-EC2-orange.svg)](https://aws.amazon.com/ec2/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://www.postgresql.org/)
 
-## 🚀 Overview
+## 🌐 Live Demo
 
-The Smart Agriculture Nutrition bridges the gap between agricultural production and personal health outcomes. It integrates with smart farming platforms, weather services, and nutrition databases to provide comprehensive insights into the food-to-health journey.
+**Access the API:** http://smart-agriculture-nutrition.duckdns.org
 
-### 🎯 Key Features
-
-- **🌾 Crop Nutrition Profiles** - Track nutritional content from smart farms with sustainability scoring
-- **👤 Personal Nutrition Tracking** - Monitor individual nutrition with BMI integration and health analytics
-- **🌤️ Weather Integration** - Real-time weather data from WeatherAPI.com for agricultural analysis
-- **🥗 USDA Nutrition Database** - Comprehensive food nutrition data from FoodData Central
-- **📊 Advanced Analytics** - Weather-nutrition correlations and health pattern analysis
-- **🔗 HATEOAS Navigation** - Fully navigable API with hypermedia links
-- **📖 Interactive Documentation** - Swagger UI with "Try it out" functionality
-- **🗄️ Visual Database Management** - pgAdmin and Adminer for data visualization
-
-## 🏗️ Architecture
-
-### REST API Design
-- **2 Upper-level Resources**: Crop Nutrition Profiles, Personal Nutrition Trackers
-- **4+ Nested Resources**: Harvest Batches, Meal Sources, Health Correlations, BMI Analysis
-- **All HTTP Methods**: GET, POST, PUT, DELETE with proper status codes
-- **JSON Format**: Consistent JSON responses with content negotiation
-- **Query Parameters**: Advanced filtering, sorting, and pagination
-- **Path Variables**: Dynamic routing with {id} parameters
-- **Custom Exception Handling**: Specific error responses with meaningful messages
-
-### Technology Stack
-- **Backend**: Java 21, JAX-RS 3.1, Jersey
-- **Database**: PostgreSQL 15 with JDBC
-- **Documentation**: OpenAPI 3.0, Swagger UI
-- **External APIs**: WeatherAPI.com, USDA FoodData Central
-- **Testing**: JUnit 5, Testcontainers, JMeter
-- **Deployment**: Docker Compose, Maven WAR packaging
-- **Database Tools**: pgAdmin, Adminer
+- **Swagger UI:** http://smart-agriculture-nutrition.duckdns.org/SmartAgricultureNutrition/api/v1/swagger
+- **API Base:** http://smart-agriculture-nutrition.duckdns.org/SmartAgricultureNutrition/api/v1/
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Docker & Docker Compose (Recommended)
-- OR Java 21+ and Maven 3.6+ for manual deployment
+### Local Development
 
-## 🐳 Docker Production Deployment (Recommended)
-
-### 1. Clone/Extract Project
 ```bash
-# Navigate to the project directory
-cd SmartAgricultureNutrition
+# Clone repository
+git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
+cd Smart-Agriculture-Nutrition
+
+# Start with Docker Compose
+docker-compose up -d --build
+
+# Access locally
+open http://localhost/SmartAgricultureNutrition/api/v1/swagger
 ```
 
-### 2. Start Complete Production Stack
-```bash
-# Start all services with production configuration
-docker-compose -f docker-compose.prod.yml up -d
+### Production Deployment (AWS EC2)
 
-# Verify all services are running
-docker-compose -f docker-compose.prod.yml ps
+```bash
+# SSH to EC2
+ssh -i your-key.pem ubuntu@ec2-ip
+
+# Clone and deploy
+git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
+cd Smart-Agriculture-Nutrition
+./scripts/deploy.sh
+
+# For updates
+./scripts/quick-redeploy.sh
 ```
 
-**This single command starts:**
-- ✅ **Java Application** (Multi-stage build with Maven + Tomcat 9)
-- ✅ **PostgreSQL Database** (with health checks and sample data)
-- ✅ **Nginx Reverse Proxy** (load balancing and static content)
-- ✅ **pgAdmin** (database management interface)
-- ✅ **Adminer** (lightweight database tool)
-
-### 3. Access the Production Application
-- **🌐 Main Application (via Nginx)**: `http://localhost/`
-- **🔗 API Base URL (via Nginx)**: `http://localhost/SmartAgricultureNutrition/api/v1/`
-- **📖 Swagger UI**: `http://localhost/SmartAgricultureNutrition/api/v1/swagger-ui`
-- **📋 OpenAPI Spec**: `http://localhost/SmartAgricultureNutrition/api/v1/openapi.json`
-- **🗄️ pgAdmin**: `http://localhost:5050` (admin@agriculture.com / admin123)
-- **⚡ Adminer**: `http://localhost:8081`
-- **🏥 Health Check**: `http://localhost/health`
-
-### 4. Direct Application Access (Bypass Nginx)
-- **Main Application**: `http://localhost:8080/SmartAgricultureNutrition/`
-- **API Base URL**: `http://localhost:8080/SmartAgricultureNutrition/api/v1/`
-
-## 🛠️ Manual Development Setup
-
-### Prerequisites for Manual Setup
-- Java 21 or higher
-- Maven 3.6+
-- Docker & Docker Compose (for database services)
-- Application Server (Tomcat, WildFly, etc.)
-
-### 1. Start Database Services Only
-```bash
-# Start PostgreSQL, pgAdmin, and Adminer only
-docker-compose up -d
-
-# Verify services are running
-docker-compose ps
-```
-
-### 2. Populate Database with Sample Data
-```bash
-# Run the sample data migration (includes 97 comprehensive records)
-docker exec -i smart-agriculture-db psql -U agriculture_user -d smart_agriculture_nutrition < "src/main/resources/db/migration/sample_data.sql"
-
-# Verify data population
-docker exec smart-agriculture-db psql -U agriculture_user -d smart_agriculture_nutrition -c "SELECT COUNT(*) FROM crop_nutrition_profiles; SELECT COUNT(*) FROM personal_nutrition_trackers; SELECT COUNT(*) FROM harvest_batches; SELECT COUNT(*) FROM meal_sources;"
-```
-
-**Expected Results:**
-- 20 crop_nutrition_profiles
-- 22 personal_nutrition_trackers  
-- 21 harvest_batches
-- 34 meal_sources
-
-### 3. Build and Deploy Application Manually
-```bash
-# Build the project
-mvn clean package -Dmaven.test.skip=true
-
-# Deploy to your application server (example for Eclipse/Tomcat)
-# Copy target/SmartAgricultureNutrition.war to your server's webapps directory
-# Or use your IDE's deployment features
-```
-
-### 4. Access the Manual Deployment
-- **Main Application**: `http://localhost:8080/SmartAgricultureNutrition/`
-- **API Base URL**: `http://localhost:8080/SmartAgricultureNutrition/api/v1/`
-- **Swagger UI**: `http://localhost:8080/SmartAgricultureNutrition/api/v1/swagger-ui`
-- **OpenAPI Spec**: `http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json`
-- **pgAdmin**: `http://localhost:5050` (admin@agriculture.com / admin123)
-- **Adminer**: `http://localhost:8081`
-
-### 6. Test the API
-```bash
-# Test crop profiles endpoint
-curl -s "http://localhost:8080/SmartAgricultureNutrition/api/v1/crop-nutrition-profiles" | jq 'length'
-# Should return: 20
-
-# Test nutrition trackers endpoint  
-curl -s "http://localhost:8080/SmartAgricultureNutrition/api/v1/nutrition-trackers" | jq 'length'
-# Should return: 22
-
-# Test search functionality
-curl -s "http://localhost:8080/SmartAgricultureNutrition/api/v1/crop-nutrition-profiles/search/region?region=Finland" | jq 'length'
-# Should return: 20
-```
-
-## 📖 API Documentation
+## 📖 API Endpoints
 
 ### Core Resources
 
-#### 🌾 Crop Nutrition Profiles
-```http
-GET    /api/v1/crop-nutrition-profiles              # List all profiles
-GET    /api/v1/crop-nutrition-profiles?crop_type=tomato&growing_method=organic
-POST   /api/v1/crop-nutrition-profiles              # Create new profile
-GET    /api/v1/crop-nutrition-profiles/{id}         # Get specific profile
-PUT    /api/v1/crop-nutrition-profiles/{id}         # Update profile
-DELETE /api/v1/crop-nutrition-profiles/{id}         # Delete profile
+| Resource               | Endpoint                            | Description                      |
+| ---------------------- | ----------------------------------- | -------------------------------- |
+| **Crop Profiles**      | `/api/v1/crop-nutrition-profiles`   | Agricultural crop nutrition data |
+| **Nutrition Trackers** | `/api/v1/nutrition-trackers`        | Personal nutrition tracking      |
+| **Weather**            | `/api/v1/weather/current/{city}`    | Real-time weather data           |
+| **USDA Nutrition**     | `/api/v1/nutrition/food/{foodName}` | Food nutrition database          |
 
-# Search Endpoints
-GET    /api/v1/crop-nutrition-profiles/search/crop-type?cropType=tomato
-GET    /api/v1/crop-nutrition-profiles/search/growing-method?method=organic
-GET    /api/v1/crop-nutrition-profiles/search/region?region=Finland
+### Authentication
 
-# Nested Resources
-GET    /api/v1/crop-nutrition-profiles/{id}/harvest-batches
-POST   /api/v1/crop-nutrition-profiles/{id}/harvest-batches
-GET    /api/v1/crop-nutrition-profiles/{id}/soil-impact
+```bash
+# Register
+curl -X POST http://localhost/SmartAgricultureNutrition/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"test","password":"Test123!","email":"test@test.com"}'
+
+# Login (returns JWT token)
+curl -X POST http://localhost/SmartAgricultureNutrition/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"test","password":"Test123!"}'
+
+# Use token
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  http://localhost/SmartAgricultureNutrition/api/v1/crop-nutrition-profiles
 ```
 
-#### 👤 Personal Nutrition Trackers
-```http
-GET    /api/v1/nutrition-trackers                   # List all trackers
-GET    /api/v1/nutrition-trackers?bmi_range=20-25&health_goal=Weight+Maintenance
-POST   /api/v1/nutrition-trackers                   # Create new tracker
-GET    /api/v1/nutrition-trackers/{id}              # Get specific tracker
-PUT    /api/v1/nutrition-trackers/{id}              # Update tracker
+## 🏗️ Architecture
 
-# Nested Resources
-GET    /api/v1/nutrition-trackers/{id}/meal-sources
-POST   /api/v1/nutrition-trackers/{id}/meal-sources
-GET    /api/v1/nutrition-trackers/{id}/health-correlations
-GET    /api/v1/nutrition-trackers/{id}/bmi-analysis
+### Technology Stack
+- **Backend:** Java 17, JAX-RS, Jersey
+- **Database:** PostgreSQL 15
+- **Containerization:** Docker & Docker Compose
+- **Documentation:** OpenAPI 3.0, Swagger UI
+- **Cloud:** AWS EC2
+- **Domain:** DuckDNS (Dynamic DNS)
+
+### Project Structure
+```
+SmartAgricultureNutrition/
+├── src/                    # Java source code
+├── docker-compose.yml      # Development setup
+├── docker-compose.prod.yml # Production setup
+├── Dockerfile             # Optimized multi-stage build
+├── scripts/
+│   ├── deploy.sh          # Initial deployment
+│   ├── redeploy.sh        # Full redeployment
+│   └── quick-redeploy.sh  # Quick updates
+└── database/              # SQL schemas
 ```
 
-#### 🌤️ External API Integrations
-```http
-GET    /api/v1/weather/current/{city}               # Real-time weather data
-GET    /api/v1/nutrition/crop/{cropName}            # USDA nutrition data
-GET    /api/v1/correlations/crop-weather-nutrition/{city}/{crop}  # Advanced analytics
+## 🔧 Configuration
+
+### Environment Variables (.env)
+```env
+# Database
+POSTGRES_DB=smart_agriculture_nutrition
+POSTGRES_USER=agriculture_user
+POSTGRES_PASSWORD=your_secure_password
+
+# API Keys (optional)
+WEATHER_API_KEY=your_weather_api_key
+USDA_API_KEY=your_usda_api_key
+
+# Security
+JWT_SECRET=your_secure_jwt_secret
 ```
 
-### Sample API Calls
-Try these endpoints to explore the API:
-- [View all crop profiles](http://localhost:8080/SmartAgricultureNutrition/api/v1/crop-nutrition-profiles)
-- [View specific crop with HATEOAS](http://localhost:8080/SmartAgricultureNutrition/api/v1/crop-nutrition-profiles/1)
-- [Search by crop type](http://localhost:8080/SmartAgricultureNutrition/api/v1/crop-nutrition-profiles/search/crop-type?cropType=tomato)
-- [Search by growing method](http://localhost:8080/SmartAgricultureNutrition/api/v1/crop-nutrition-profiles/search/growing-method?method=organic)
-- [Search by region](http://localhost:8080/SmartAgricultureNutrition/api/v1/crop-nutrition-profiles/search/region?region=Finland)
-- [View harvest batches](http://localhost:8080/SmartAgricultureNutrition/api/v1/crop-nutrition-profiles/1/harvest-batches)
-- [Soil impact analysis](http://localhost:8080/SmartAgricultureNutrition/api/v1/crop-nutrition-profiles/1/soil-impact)
-- [View nutrition trackers](http://localhost:8080/SmartAgricultureNutrition/api/v1/nutrition-trackers)
-- [BMI analysis](http://localhost:8080/SmartAgricultureNutrition/api/v1/nutrition-trackers/1/bmi-analysis)
+## 🚀 Deployment Guide
 
-## 🗄️ Database Management
+### AWS EC2 Setup
 
-### Visual Database Tools
+1. **Launch EC2 Instance**
+   - Ubuntu 22.04 LTS
+   - t2.small or larger
+   - Security Group: Open ports 22, 80, 8080
 
-#### pgAdmin (Recommended)
-- **URL**: `http://localhost:5050`
-- **Login**: admin@agriculture.com / admin123
-- **Features**: Full PostgreSQL management, visual query builder, schema explorer
+2. **Initial Deployment**
+   ```bash
+   ssh -i your-key.pem ubuntu@ec2-ip
+   curl -O https://raw.githubusercontent.com/salmanprottoy/Smart-Agriculture-Nutrition/main/scripts/deploy.sh
+   chmod +x deploy.sh
+   ./deploy.sh
+   ```
 
-#### Adminer (Lightweight)
-- **URL**: `http://localhost:8081`
-- **Connection**: PostgreSQL, Server: `postgres`, User: `agriculture_user`, Password: `nutrition_pass_2024`, Database: `smart_agriculture_nutrition`
+3. **Setup DuckDNS (Free Domain)**
+   - Register at https://www.duckdns.org
+   - Create subdomain
+   - Run on EC2:
+   ```bash
+   # Replace with your token
+   TOKEN="your-duckdns-token"
+   echo "curl -s 'https://www.duckdns.org/update?domains=your-domain&token=$TOKEN&ip=\$(curl -s ifconfig.me)'" > ~/update-duckdns.sh
+   chmod +x ~/update-duckdns.sh
+   (crontab -l 2>/dev/null; echo "*/5 * * * * ~/update-duckdns.sh") | crontab -
+   ```
 
-### Database Schema
-- `crop_nutrition_profiles` - Agricultural crop data with sustainability metrics (20 records)
-- `personal_nutrition_trackers` - User health tracking with BMI integration (22 records)
-- `harvest_batches` - Harvest information linked to crop profiles (21 records)
-- `meal_sources` - Meal tracking with farm-to-fork scoring (34 records)
+### Updating Code
 
-### Sample Data Overview
-The project includes comprehensive sample data with **97 total records**:
+```bash
+# On local machine
+git add . && git commit -m "Update" && git push
 
-#### 🌾 Crop Nutrition Profiles (20 records)
-- **Organic Crops**: Tomatoes, Spinach, Blueberries, Kale, Cabbage, Broccoli, Beets
-- **Hydroponic Crops**: Carrots, Lettuce, Cucumbers, Strawberries, Peppers, Radishes, Herbs
-- **Traditional Crops**: Wheat, Potatoes, Barley, Rye, Oats, Turnips
-- **Locations**: 20 different Finnish cities
-- **Growing Methods**: Organic, Hydroponic, Traditional
-- **Sustainability Scores**: Range 6.5 to 9.3
-
-#### 👤 Personal Nutrition Trackers (22 records)
-Real user names from your class including:
-- Alejandro Fernandez Armas, Arsalan Vosough, Hassan Syed, Zoltan Papp
-- Muhammad Feroz, Haben Eyasu, Ke Qiu, Danial Farooq, Javeria Kanwal
-- Sofiia Mikhailova, João Moreira, Luca Stoian, Sufian Embark Aomar
-- Md. Salman Hossan Prottoy, Elham Pournouri, Md Ariful Islam
-- Jakub Formánek, Muhammad Hassan Ali, Talha Bin Nayyar
-- Sibrah Rahim, Sana Mazhar, Asma Sikandar
-
-#### 🌾 Harvest Batches (21 records)
-- Quality grades: A+, A, B+, B
-- Quantities: 12.7kg to 245.7kg
-- Detailed storage conditions and batch notes
-
-#### 🍽️ Meal Sources (34 records)
-- Diverse meal types: breakfast, lunch, dinner, snacks
-- Ingredients with detailed JSONB data
-- Local sourcing percentages: 75-100%
-- Farm origins and nutritional density scores
-
-### Sample Database Operations
-```sql
--- View all crop profiles
-SELECT * FROM crop_nutrition_profiles;
-
--- Get nutrition trackers with BMI info
-SELECT user_name, age, current_bmi, health_goals 
-FROM personal_nutrition_trackers;
-
--- Join tables for comprehensive view
-SELECT 
-    cp.crop_name,
-    cp.farm_location,
-    hb.harvest_date,
-    hb.quantity_kg
-FROM crop_nutrition_profiles cp
-LEFT JOIN harvest_batches hb ON cp.id = hb.crop_id;
+# On EC2
+cd ~/Smart-Agriculture-Nutrition
+./scripts/quick-redeploy.sh
 ```
+
+**Note:** Database data persists across redeployments!
+
+## 📊 Features
+
+- ✅ **RESTful API** with HATEOAS navigation
+- ✅ **JWT Authentication** for security
+- ✅ **Swagger UI** for interactive documentation
+- ✅ **Docker Containerization** for easy deployment
+- ✅ **PostgreSQL Database** with persistent storage
+- ✅ **External API Integration** (Weather, USDA)
+- ✅ **CORS Support** for web clients
+- ✅ **Health Checks** for monitoring
+- ✅ **Optimized Docker Images** (multi-stage build)
 
 ## 🧪 Testing
 
-### Run Tests
 ```bash
-# Unit tests
+# Run unit tests
 mvn test
 
-# Integration tests (requires Docker)
-mvn verify -P integration-tests
+# Test with curl
+curl http://localhost/SmartAgricultureNutrition/api/v1/crop-nutrition-profiles
 
 # Load testing with JMeter
 mvn jmeter:jmeter
 ```
 
-### Test Coverage
-- **Unit Tests**: Service layer, business logic, utilities
-- **Integration Tests**: Database operations, API endpoints
-- **Load Tests**: Performance testing with JMeter scenarios
+## 💰 Cost Management
 
-## 🚀 Deployment
+**AWS EC2 Costs:**
+- Running: ~$19/month (t2.small)
+- Stopped: ~$2/month (storage only)
 
-### 🐳 Production Docker Deployment (Recommended)
-```bash
-# Complete production stack with single command
-docker-compose -f docker-compose.prod.yml up -d --build
+**Save money:** Stop instance when not in use via AWS Console
 
-# Check all services status
-docker-compose -f docker-compose.prod.yml ps
+## 📝 Documentation
 
-# View logs if needed
-docker-compose -f docker-compose.prod.yml logs -f app
-docker-compose -f docker-compose.prod.yml logs -f nginx
-```
-
-**Production Stack Includes:**
-- **Java Application**: Multi-stage Docker build (Maven + Tomcat 9 + Java 17)
-- **PostgreSQL Database**: Persistent storage with health checks
-- **Nginx Reverse Proxy**: Load balancing and static content serving
-- **Database Tools**: pgAdmin and Adminer for management
-
-### Development
-```bash
-# Start database services only
-docker-compose up -d
-
-# Build and deploy manually
-mvn clean compile war:war
-# Deploy target/SmartAgricultureNutrition.war to your server
-```
-
-### Manual Production Build
-```bash
-# Production WAR build
-mvn clean package -DskipTests
-
-# Deploy WAR file to your application server
-# Copy target/SmartAgricultureNutrition.war to server's webapps directory
-```
-
-### Docker Services & Ports
-- **Java Application**: Port 8080 (Direct access)
-- **Nginx Reverse Proxy**: Port 80 (Production access)
-- **PostgreSQL**: Port 5432 (Database)
-- **pgAdmin**: Port 5050 (Database Management)
-- **Adminer**: Port 8081 (Alternative DB Tool)
-
-### Production Features
-- **Multi-stage Docker Build**: Optimized image size with build and runtime stages
-- **Health Checks**: Automatic service health monitoring
-- **Persistent Volumes**: Database data persistence across container restarts
-- **Nginx Load Balancing**: Production-ready reverse proxy configuration
-- **Environment Configuration**: Separate development and production settings
-
-## 🔧 Configuration
-
-### Environment Variables (.env)
-```bash
-# Database Configuration
-POSTGRES_DB=smart_agriculture_nutrition
-POSTGRES_USER=agriculture_user
-POSTGRES_PASSWORD=nutrition_pass_2024
-
-# External API Keys (Optional)
-WEATHER_API_KEY=your_weatherapi_key
-USDA_API_KEY=your_usda_key
-
-# Application Settings
-API_BASE_URL=http://localhost:8080/SmartAgricultureNutrition
-```
-
-### Application Properties
-Key configurations in `src/main/java/com/agriculture/nutrition/config/`:
-- **DatabaseConfig.java**: PostgreSQL connection settings
-- **SwaggerConfig.java**: OpenAPI documentation configuration
-
-## 📊 Features Checklist
-
-### ✅ REST API Requirements
-- [x] **2 Upper-level Resources**: Crop Nutrition Profiles, Personal Nutrition Trackers
-- [x] **2+ Nested Resources**: Harvest Batches, Meal Sources, Health Correlations, BMI Analysis
-- [x] **All HTTP Methods**: GET, POST, PUT, DELETE
-- [x] **JSON Format**: Consistent JSON responses
-- [x] **Path Variables**: Dynamic routing with {id} parameters
-- [x] **Query Parameters**: Filtering, sorting, pagination
-- [x] **Status Codes**: Proper HTTP status codes (200, 201, 204, 404, 500)
-- [x] **Custom Exception Handling**: Specific error responses
-- [x] **HATEOAS**: Hypermedia links for API navigation
-- [x] **Rich Sample Data**: Comprehensive in-memory data for demonstration
-
-### ✅ Advanced Features
-- [x] **PostgreSQL Integration**: Full database persistence
-- [x] **External API Integration**: WeatherAPI.com, USDA FoodData Central
-- [x] **Interactive Documentation**: Swagger UI with "Try it out"
-- [x] **Visual Database Management**: pgAdmin, Adminer
-- [x] **Comprehensive Testing**: Unit, Integration, Load tests
-- [x] **Production Ready**: Docker, Nginx, environment configuration
-- [x] **Advanced Analytics**: Weather-nutrition correlations
+- **API Documentation:** [Swagger UI](http://smart-agriculture-nutrition.duckdns.org/SmartAgricultureNutrition/api/v1/swagger)
+- **Deployment Guide:** [AWS_EC2_DEPLOYMENT.md](AWS_EC2_DEPLOYMENT.md)
+- **Management Guide:** [EC2_MANAGEMENT_GUIDE.md](EC2_MANAGEMENT_GUIDE.md)
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create feature branch (`git checkout -b feature/amazing`)
+3. Commit changes (`git commit -m 'Add feature'`)
+4. Push to branch (`git push origin feature/amazing`)
+5. Open Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
 
-## 🙏 Acknowledgments
+## 👨‍💻 Author
 
-- **WeatherAPI.com** for real-time weather data
-- **USDA FoodData Central** for comprehensive nutrition database
-- **PostgreSQL** for robust database management
-- **Swagger/OpenAPI** for excellent API documentation tools
+**Md. Salman Hossan Prottoy**
+- GitHub: [@salmanprottoy](https://github.com/salmanprottoy)
 
 ---
 
-**🎯 This REST Web Service demonstrates modern API design patterns, database integration, external API consumption, comprehensive testing, and production-ready deployment configuration.**
-
-For questions or support, please open an issue in the repository.
+**Live Demo:** http://smart-agriculture-nutrition.duckdns.org
