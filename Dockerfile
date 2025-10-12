@@ -1,6 +1,6 @@
 # Multi-stage build for Smart Agriculture Nutrition REST API
 # Stage 1: Build stage
-FROM maven:3.9-eclipse-temurin-17-alpine AS build
+FROM maven:3.9-eclipse-temurin-17 AS build
 
 # Set working directory
 WORKDIR /app
@@ -18,8 +18,8 @@ COPY src ./src
 RUN mvn clean package -DskipTests \
     && mv target/SmartAgricultureNutrition.war target/app.war
 
-# Stage 2: Runtime stage - Using smaller JRE image
-FROM tomcat:9.0-jre17-temurin-jammy
+# Stage 2: Runtime stage - Using JRE image
+FROM tomcat:9.0-jre17-temurin
 
 # Add non-root user for security
 RUN groupadd -r tomcat && useradd -r -g tomcat tomcat
@@ -29,6 +29,9 @@ RUN rm -rf /usr/local/tomcat/webapps/* \
     && rm -rf /usr/local/tomcat/webapps.dist \
     && rm -rf /usr/local/tomcat/temp/* \
     && rm -rf /usr/local/tomcat/logs/*
+
+# Install curl for health checks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Copy the built WAR file from build stage
 COPY --from=build --chown=tomcat:tomcat /app/target/app.war /usr/local/tomcat/webapps/SmartAgricultureNutrition.war

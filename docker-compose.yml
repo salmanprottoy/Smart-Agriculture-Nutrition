@@ -1,6 +1,9 @@
+version: "3.8"
+
 services:
+  # PostgreSQL Database
   postgres:
-    image: postgres:15-alpine
+    image: postgres:15
     container_name: smart-agriculture-db
     environment:
       POSTGRES_DB: smart_agriculture_nutrition
@@ -25,6 +28,46 @@ services:
       timeout: 10s
       retries: 3
 
+  # Java Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: smart-agriculture-app:latest
+    container_name: agriculture-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: smart_agriculture_nutrition
+      DB_USERNAME: agriculture_user
+      DB_PASSWORD: nutrition_pass_2024
+      WEATHER_API_KEY: ${WEATHER_API_KEY:-your_weather_api_key}
+      USDA_API_KEY: ${USDA_API_KEY:-your_usda_api_key}
+      JWT_SECRET: ${JWT_SECRET:-your-secure-jwt-secret-2024}
+      PORT: 8080
+    ports:
+      - "80:8080" # Access via http://localhost/
+      - "8080:8080" # Access via http://localhost:8080/
+    networks:
+      - agriculture-network
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:8080/SmartAgricultureNutrition/",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Database Admin Tools (Optional - for development)
   adminer:
     image: adminer:4.8.1
     container_name: smart-agriculture-adminer
@@ -35,6 +78,8 @@ services:
     depends_on:
       - postgres
     restart: unless-stopped
+    profiles:
+      - dev
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -50,6 +95,8 @@ services:
     depends_on:
       - postgres
     restart: unless-stopped
+    profiles:
+      - dev
 
 volumes:
   postgres_data:
