@@ -1,0 +1,65 @@
+# Git files
+.git
+.gitignore
+.github
+
+# Documentation
+*.md
+LICENSE
+docs/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Build artifacts (will be built fresh)
+target/
+*.war
+*.jar
+
+# Test files (not needed in production)
+src/test/
+*.jmx
+
+# Environment files (should be provided at runtime)
+.env*
+*.env
+
+# Docker files
+docker-compose*.yml
+Dockerfile.*
+
+# Scripts (not needed in container)
+scripts/
+
+# Database files (managed separately)
+database/
+*.sql
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# Node modules (if any frontend exists)
+node_modules/
+
+# Python files (if any scripts)
+*.pyc
+__pycache__/
+
+# Nginx configuration (separate service)
+nginx/
