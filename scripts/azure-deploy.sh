@@ -287,11 +287,15 @@ EOF
     
     # Create URL rewrite configuration to fix localhost issue
     sudo tee /etc/nginx/snippets/url-rewrite.conf > /dev/null << EOF
-# Rewrite localhost URLs in responses
-sub_filter 'http://localhost:8080' 'http://$VM_IP';
-sub_filter 'localhost:8080' '$VM_IP';
+# Rewrite localhost URLs in responses - comprehensive fix for Swagger
+sub_filter_types application/json text/html application/javascript text/javascript;
 sub_filter_once off;
-sub_filter_types application/json application/javascript;
+sub_filter 'http://localhost:8080' 'http://$VM_IP';
+sub_filter 'https://localhost:8080' 'https://$VM_IP';
+sub_filter 'localhost:8080' '$VM_IP';
+sub_filter '"url":"http://localhost:8080' '"url":"http://$VM_IP';
+sub_filter '"servers":[{"url":"http://localhost:8080' '"servers":[{"url":"http://$VM_IP';
+sub_filter 'basePath":"http://localhost:8080' 'basePath":"http://$VM_IP';
 EOF
     
     print_message "Creating Nginx configuration with all fixes..." "$BLUE"
@@ -353,10 +357,17 @@ server {
         proxy_hide_header 'Access-Control-Allow-Credentials';
     }
     
-    # Swagger UI specific
+    # Swagger UI specific with enhanced URL rewriting
     location = /api/v1/swagger {
         include /etc/nginx/snippets/cors.conf;
-        include /etc/nginx/snippets/url-rewrite.conf;
+        
+        # Enhanced URL rewriting for Swagger
+        sub_filter_types application/json text/html application/javascript text/javascript;
+        sub_filter_once off;
+        sub_filter 'http://localhost:8080' 'http://$VM_IP';
+        sub_filter 'localhost:8080' '$VM_IP';
+        sub_filter '"url":"http://localhost:8080' '"url":"http://$VM_IP';
+        sub_filter '"servers":[{"url":"http://localhost:8080' '"servers":[{"url":"http://$VM_IP';
         
         proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/swagger;
         proxy_http_version 1.1;
@@ -364,6 +375,7 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header X-Forwarded-Host \$host;
     }
     
     # OpenAPI JSON paths
