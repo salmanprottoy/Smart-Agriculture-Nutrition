@@ -149,13 +149,45 @@ setup_env_file() {
         cp .env .env.backup.$(date +%Y%m%d_%H%M%S)
     fi
     
+    # Ask for API keys
+    print_message "API Keys Configuration" "$CYAN"
+    print_message "These are optional but recommended for full functionality" "$YELLOW"
+    echo
+    
+    # Weather API Key
+    print_message "Weather API (OpenWeatherMap):" "$BLUE"
+    print_message "Get your free API key at: https://openweathermap.org/api" "$YELLOW"
+    read -p "Enter your Weather API key (or press Enter to skip): " WEATHER_KEY
+    if [ -z "$WEATHER_KEY" ]; then
+        WEATHER_KEY="your_weather_api_key_here"
+        print_message "Weather API key skipped (you can add it later)" "$YELLOW"
+    else
+        print_message "✓ Weather API key configured" "$GREEN"
+    fi
+    echo
+    
+    # USDA API Key
+    print_message "USDA FoodData Central API:" "$BLUE"
+    print_message "Get your free API key at: https://fdc.nal.usda.gov/api-key-signup.html" "$YELLOW"
+    read -p "Enter your USDA API key (or press Enter to skip): " USDA_KEY
+    if [ -z "$USDA_KEY" ]; then
+        USDA_KEY="your_usda_api_key_here"
+        print_message "USDA API key skipped (you can add it later)" "$YELLOW"
+    else
+        print_message "✓ USDA API key configured" "$GREEN"
+    fi
+    echo
+    
     # Copy Azure environment template if it exists
     if [ -f ".env.azure" ]; then
         print_message "Using .env.azure template..." "$BLUE"
         cp .env.azure .env
+        # Update API keys in the copied file
+        sed -i "s/WEATHER_API_KEY=.*/WEATHER_API_KEY=$WEATHER_KEY/" .env
+        sed -i "s/USDA_API_KEY=.*/USDA_API_KEY=$USDA_KEY/" .env
     else
         print_message "Creating .env file..." "$BLUE"
-        cat > .env << 'EOF'
+        cat > .env << EOF
 # Database Configuration
 POSTGRES_DB=smart_agriculture_nutrition
 POSTGRES_USER=agriculture_user
@@ -168,9 +200,9 @@ DB_NAME=smart_agriculture_nutrition
 DB_USERNAME=agriculture_user
 DB_PASSWORD=AgriNutri2024SecurePass!
 
-# API Keys (replace with your actual keys)
-WEATHER_API_KEY=your_weather_api_key_here
-USDA_API_KEY=your_usda_api_key_here
+# API Keys
+WEATHER_API_KEY=$WEATHER_KEY
+USDA_API_KEY=$USDA_KEY
 
 # JWT Secret
 JWT_SECRET=your-super-secure-jwt-secret-key-2024
@@ -193,9 +225,22 @@ EOF
     echo "# Swagger Configuration" >> .env
     echo "SWAGGER_SERVER_URL=http://$VM_IP/SmartAgricultureNutrition" >> .env
     
-    print_message "✓ .env file created with CORS settings" "$GREEN"
-    print_message "IMPORTANT: Edit the .env file to add your actual API keys:" "$RED"
-    print_message "  nano ~/SmartAgricultureNutrition/.env" "$YELLOW"
+    print_message "✓ .env file created with configuration" "$GREEN"
+    
+    # Show summary of API key configuration
+    if [ "$WEATHER_KEY" != "your_weather_api_key_here" ] || [ "$USDA_KEY" != "your_usda_api_key_here" ]; then
+        print_message "API Keys configured:" "$GREEN"
+        if [ "$WEATHER_KEY" != "your_weather_api_key_here" ]; then
+            print_message "  ✓ Weather API" "$GREEN"
+        fi
+        if [ "$USDA_KEY" != "your_usda_api_key_here" ]; then
+            print_message "  ✓ USDA API" "$GREEN"
+        fi
+    fi
+    
+    print_message "\nTo update API keys later:" "$BLUE"
+    print_message "  nano ~/SmartAgricultureNutrition/.env" "$CYAN"
+    print_message "  Then restart: sudo docker-compose -f docker-compose.azure.yml restart" "$CYAN"
 }
 
 # Build and start application
