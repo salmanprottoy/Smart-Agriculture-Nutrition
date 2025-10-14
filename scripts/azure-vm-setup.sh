@@ -187,11 +187,20 @@ EOF
 start_application() {
     print_header "Starting Application with Docker Compose"
     
+    # Check if Azure-specific compose file exists, otherwise use prod
+    if [ -f "docker-compose.azure.yml" ]; then
+        COMPOSE_FILE="docker-compose.azure.yml"
+        print_message "Using Azure-optimized Docker Compose configuration..." "$GREEN"
+    else
+        COMPOSE_FILE="docker-compose.prod.yml"
+        print_message "Using standard production Docker Compose configuration..." "$YELLOW"
+    fi
+    
     print_message "Building Docker images..." "$BLUE"
-    sudo docker-compose -f docker-compose.prod.yml build
+    sudo docker-compose -f $COMPOSE_FILE build
     
     print_message "Starting containers..." "$BLUE"
-    sudo docker-compose -f docker-compose.prod.yml up -d
+    sudo docker-compose -f $COMPOSE_FILE up -d
     
     print_message "Waiting for services to start..." "$YELLOW"
     sleep 30
@@ -302,8 +311,8 @@ Type=simple
 Restart=always
 RestartSec=10
 WorkingDirectory=/home/$USER/SmartAgricultureNutrition
-ExecStart=/usr/bin/docker-compose -f docker-compose.prod.yml up
-ExecStop=/usr/bin/docker-compose -f docker-compose.prod.yml down
+ExecStart=/usr/bin/docker-compose -f docker-compose.azure.yml up
+ExecStop=/usr/bin/docker-compose -f docker-compose.azure.yml down
 User=$USER
 
 [Install]
@@ -365,12 +374,12 @@ display_summary() {
     print_message "   nano ~/SmartAgricultureNutrition/.env" "$CYAN"
     print_message "2. Restart the application after updating .env:" "$YELLOW"
     print_message "   cd ~/SmartAgricultureNutrition" "$CYAN"
-    print_message "   sudo docker-compose -f docker-compose.prod.yml restart" "$CYAN"
+    print_message "   sudo docker-compose -f docker-compose.azure.yml restart" "$CYAN"
     echo
     print_message "Useful commands:" "$BLUE"
-    print_message "  View logs: sudo docker-compose -f docker-compose.prod.yml logs -f" "$CYAN"
-    print_message "  Stop app: sudo docker-compose -f docker-compose.prod.yml down" "$CYAN"
-    print_message "  Start app: sudo docker-compose -f docker-compose.prod.yml up -d" "$CYAN"
+    print_message "  View logs: sudo docker-compose -f docker-compose.azure.yml logs -f" "$CYAN"
+    print_message "  Stop app: sudo docker-compose -f docker-compose.azure.yml down" "$CYAN"
+    print_message "  Start app: sudo docker-compose -f docker-compose.azure.yml up -d" "$CYAN"
     print_message "  Check status: sudo docker ps" "$CYAN"
     echo
     print_message "To save costs, remember to:" "$RED"

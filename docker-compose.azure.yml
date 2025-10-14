@@ -1,9 +1,10 @@
 version: "3.8"
 
+# Optimized for Azure B1s VM (1 vCPU, 1GB RAM)
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:15 # Use standard image for better compatibility
+    image: postgres:15
     container_name: agriculture-postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-smart_agriculture_nutrition}
@@ -26,14 +27,10 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 256M
-        reservations:
-          cpus: "0.25"
-          memory: 128M
+    # Resource limits for Azure B1s
+    mem_limit: 256m
+    memswap_limit: 256m
+    cpu_shares: 512
     logging:
       driver: "json-file"
       options:
@@ -61,11 +58,11 @@ services:
       JWT_SECRET: ${JWT_SECRET:-your-secure-jwt-secret-2024}
       PORT: 8080
       APP_ENVIRONMENT: production
-      # JVM memory settings for container
-      JAVA_OPTS: "-XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0"
+      # JVM memory settings optimized for Azure B1s
+      JAVA_OPTS: "-Xmx384m -Xms128m -XX:MaxMetaspaceSize=128m -XX:+UseG1GC"
     ports:
-      - "80:8080" # Map external port 80 to internal port 8080
-      - "8080:8080" # Direct access (optional)
+      - "80:8080"
+      - "8080:8080"
     networks:
       - agriculture-network
     restart: unless-stopped
@@ -81,20 +78,15 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 512M
-        reservations:
-          cpus: "0.25"
-          memory: 256M
+    # Resource limits for Azure B1s
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpu_shares: 512
     logging:
       driver: "json-file"
       options:
         max-size: "20m"
         max-file: "5"
-    # Security options
     security_opt:
       - no-new-privileges:true
 
