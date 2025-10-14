@@ -78,6 +78,37 @@ sudo docker-compose -f docker-compose.prod.yml restart
 
 ---
 
+## 🌍 Setup DuckDNS Domain (Optional)
+
+Want a free domain name instead of using IP address? Use DuckDNS!
+
+### Get Your Free DuckDNS Domain
+1. Go to https://www.duckdns.org
+2. Sign in with GitHub/Google/Reddit
+3. Create a subdomain (e.g., `myapp`)
+4. Copy your token
+
+### Setup on Azure VM
+```bash
+# SSH to your VM
+ssh -i azure_vm_key.pem azureuser@YOUR_VM_IP
+
+# Download and run DuckDNS setup
+wget https://raw.githubusercontent.com/salmanprottoy/Smart-Agriculture-Nutrition/main/scripts/azure-duckdns-setup.sh
+chmod +x azure-duckdns-setup.sh
+./azure-duckdns-setup.sh
+
+# Enter your subdomain and token when prompted
+```
+
+### Access with Your Domain
+```
+🌐 http://yoursubdomain.duckdns.org
+🔒 https://yoursubdomain.duckdns.org (if HTTPS enabled)
+```
+
+---
+
 ## 💰 Cost Management Tips
 
 ### Save Money with Auto-Shutdown
