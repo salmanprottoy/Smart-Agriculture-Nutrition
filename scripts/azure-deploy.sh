@@ -263,7 +263,13 @@ EOF
     
     print_message "Creating Nginx configuration with all fixes..." "$BLUE"
     
-    sudo tee /etc/nginx/sites-available/smart-agriculture > /dev/null << EOF
+    # Check if we have a pre-configured Nginx file in the repository
+    if [ -f ~/SmartAgricultureNutrition/nginx/nginx.azure.conf ]; then
+        print_message "Using pre-configured Nginx configuration from repository..." "$GREEN"
+        sudo cp ~/SmartAgricultureNutrition/nginx/nginx.azure.conf /etc/nginx/sites-available/smart-agriculture
+    else
+        print_message "Creating Nginx configuration..." "$BLUE"
+        sudo tee /etc/nginx/sites-available/smart-agriculture > /dev/null << EOF
 server {
     listen 80 default_server;
     server_name _;
@@ -356,6 +362,7 @@ server {
     }
 }
 EOF
+    fi
     
     # Enable the site
     sudo ln -sf /etc/nginx/sites-available/smart-agriculture /etc/nginx/sites-enabled/
