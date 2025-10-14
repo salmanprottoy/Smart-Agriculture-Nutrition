@@ -276,11 +276,11 @@ configure_nginx() {
     # Create CORS configuration
     print_message "Creating CORS configuration..." "$BLUE"
     sudo tee /etc/nginx/snippets/cors.conf > /dev/null << 'EOF'
-# CORS Headers
+# CORS Headers - Applied to all responses
 add_header 'Access-Control-Allow-Origin' '*' always;
-add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH' always;
-add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept,Origin' always;
-add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range,Authorization' always;
+add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept,Origin,X-Api-Key,X-Auth-Token' always;
+add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range,Authorization,X-Total-Count,Link' always;
 add_header 'Access-Control-Allow-Credentials' 'true' always;
 add_header 'Access-Control-Max-Age' '86400' always;
 EOF
@@ -319,18 +319,21 @@ server {
     
     # API endpoints with CORS
     location /api/ {
+        # Handle preflight OPTIONS requests
         if (\$request_method = 'OPTIONS') {
             add_header 'Access-Control-Allow-Origin' '*' always;
-            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH' always;
-            add_header 'Access-Control-Allow-Headers' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+            add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept,Origin,X-Api-Key,X-Auth-Token' always;
             add_header 'Access-Control-Max-Age' '86400' always;
             add_header 'Content-Type' 'text/plain; charset=utf-8' always;
             add_header 'Content-Length' '0' always;
             return 204;
         }
         
+        # Include CORS headers for all other requests
         include /etc/nginx/snippets/cors.conf;
         
+        # Proxy settings
         proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/;
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
@@ -342,6 +345,12 @@ server {
         proxy_connect_timeout 60s;
         proxy_send_timeout 60s;
         proxy_read_timeout 60s;
+        
+        # Ensure CORS headers are not duplicated
+        proxy_hide_header 'Access-Control-Allow-Origin';
+        proxy_hide_header 'Access-Control-Allow-Methods';
+        proxy_hide_header 'Access-Control-Allow-Headers';
+        proxy_hide_header 'Access-Control-Allow-Credentials';
     }
     
     # Swagger UI specific
@@ -378,6 +387,17 @@ server {
     
     # Full application path
     location /SmartAgricultureNutrition/ {
+        # Handle preflight OPTIONS requests
+        if (\$request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+            add_header 'Access-Control-Allow-Headers' '*' always;
+            add_header 'Access-Control-Max-Age' '86400' always;
+            add_header 'Content-Type' 'text/plain; charset=utf-8' always;
+            add_header 'Content-Length' '0' always;
+            return 204;
+        }
+        
         include /etc/nginx/snippets/cors.conf;
         
         proxy_pass http://localhost:8080/SmartAgricultureNutrition/;
@@ -386,6 +406,12 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+        
+        # Ensure CORS headers are not duplicated
+        proxy_hide_header 'Access-Control-Allow-Origin';
+        proxy_hide_header 'Access-Control-Allow-Methods';
+        proxy_hide_header 'Access-Control-Allow-Headers';
+        proxy_hide_header 'Access-Control-Allow-Credentials';
     }
     
     # Health check
