@@ -8,13 +8,6 @@
 [![Azure](https://img.shields.io/badge/Azure-VM-blue.svg)](https://azure.microsoft.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://www.postgresql.org/)
 
-## 🌐 Live Demo
-
-**Access the API:** http://smart-agriculture-nutrition.duckdns.org
-
-- **Swagger UI:** http://smart-agriculture-nutrition.duckdns.org/SmartAgricultureNutrition/api/v1/swagger
-- **API Base:** http://smart-agriculture-nutrition.duckdns.org/SmartAgricultureNutrition/api/v1/
-
 ## 🚀 Quick Start
 
 ### Local Development
@@ -328,7 +321,6 @@ mvn jmeter:jmeter
 
 ## 📝 Documentation
 
-- **API Documentation:** [Swagger UI](http://smart-agriculture-nutrition.duckdns.org/SmartAgricultureNutrition/api/v1/swagger)
 - **AWS Deployment:** [AWS_EC2_DEPLOYMENT.md](AWS_EC2_DEPLOYMENT.md)
 - **Azure Deployment:** [AZURE_VM_DEPLOYMENT.md](AZURE_VM_DEPLOYMENT.md)
 - **Azure Quick Start:** [AZURE_QUICK_START.md](AZURE_QUICK_START.md)
@@ -350,7 +342,3 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
 
 **Md. Salman Hossan Prottoy**
 - GitHub: [@salmanprottoy](https://github.com/salmanprottoy)
-
----
-
-**Live Demo:** http://smart-agriculture-nutrition.duckdns.org
