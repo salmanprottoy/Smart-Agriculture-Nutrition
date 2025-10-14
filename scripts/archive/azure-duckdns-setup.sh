@@ -92,151 +92,336 @@ EOF
     # Update Nginx configuration for DuckDNS domain
     print_message "\nUpdating Nginx configuration for DuckDNS domain..." "$BLUE"
     
-    sudo tee /etc/nginx/sites-available/smart-agriculture-duckdns > /dev/null << EOF
-server {
-    listen 80;
-    server_name $DUCKDNS_SUBDOMAIN.duckdns.org;
-    
-    client_max_body_size 10M;
-    
-    # Root path - redirect to Swagger UI
-    location = / {
-        return 301 /api/v1/swagger;
-    }
-    
-    # API endpoints
-    location /api/ {
-        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host \$host;
-        proxy_cache_bypass \$http_upgrade;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
-    }
-    
-    # Swagger UI
-    location /api/v1/swagger {
-        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/swagger;
-        proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
-    
-    # OpenAPI JSON - Fix the path
-    location /SmartAgricultureNutrition/api/v1/openapi.json {
-        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json;
-        proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-    }
-    
-    # Alternative OpenAPI path
-    location /api/v1/openapi.json {
-        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json;
-        proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-    }
-    
-    # Swagger resources
-    location /SmartAgricultureNutrition/api/v1/swagger-ui/ {
-        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/swagger-ui/;
-        proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-    }
-    
-    # Main application path
-    location /SmartAgricultureNutrition/ {
-        proxy_pass http://localhost:8080/SmartAgricultureNutrition/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host \$host;
-        proxy_cache_bypass \$http_upgrade;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
-    
-    # Health check endpoint
-    location /health {
-        proxy_pass http://localhost:8080/SmartAgricultureNutrition/;
-        proxy_http_version 1.1;
-        access_log off;
-    }
-}
+    # Use the existing nginx.azure.conf as base and modify for DuckDNS
+    if [ -f ~/SmartAgricultureNutrition/nginx/nginx.azure.conf ]; then
+        print_message "Using updated Nginx configuration from repository..." "$GREEN"
+        # Copy and modify the configuration
+        sudo cp ~/SmartAgricultureNutrition/nginx/nginx.azure.conf /etc/nginx/sites-available/smart-agriculture-duckdns
+        
+        # Update server_name for DuckDNS domain
+        sudo sed -i "s/server_name _;/server_name $DUCKDNS_SUBDOMAIN.duckdns.org;/" /etc/nginx/sites-available/smart-agriculture-duckdns
+        sudo sed -i "s/listen 80 default_server;/listen 80;/" /etc/nginx/sites-available/smart-agriculture-duckdns
+        
+        # Add IP-based fallback server block
+        sudo tee -a /etc/nginx/sites-available/smart-agriculture-duckdns > /dev/null << 'EOF'
 
-# Keep the IP-based access as fallback
+# IP-based access fallback (keep existing configuration)
 server {
     listen 80 default_server;
     server_name _;
     
     client_max_body_size 10M;
     
-    # Root redirect to Swagger
+    # Global URL rewriting to fix localhost:8080 in all responses
+    sub_filter_types application/json application/javascript text/javascript;
+    sub_filter_once off;
+    sub_filter 'http://localhost:8080' '$scheme://$host';
+    sub_filter 'https://localhost:8080' '$scheme://$host';
+    sub_filter 'localhost:8080' '$host';
+    
+    # Root redirect to Swagger UI
     location = / {
         return 301 /api/v1/swagger;
     }
     
-    # API endpoints
+    # API endpoints with CORS support
     location /api/ {
+        # Handle CORS preflight requests
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+            add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept,Origin,X-Api-Key,X-Auth-Token' always;
+            add_header 'Access-Control-Max-Age' '86400' always;
+            add_header 'Content-Type' 'text/plain; charset=utf-8' always;
+            add_header 'Content-Length' '0' always;
+            return 204;
+        }
+        
+        # CORS headers for all requests
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept,Origin,X-Api-Key,X-Auth-Token' always;
+        add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range,Authorization,X-Total-Count,Link' always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        add_header 'Access-Control-Max-Age' '86400' always;
+        
         proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        
+        # Ensure CORS headers are not duplicated from backend
+        proxy_hide_header 'Access-Control-Allow-Origin';
+        proxy_hide_header 'Access-Control-Allow-Methods';
+        proxy_hide_header 'Access-Control-Allow-Headers';
+        proxy_hide_header 'Access-Control-Allow-Credentials';
+    }
+    
+    # Swagger UI specific endpoint with comprehensive URL fix
+    location = /api/v1/swagger {
+        # Handle OPTIONS preflight
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+            add_header 'Access-Control-Allow-Headers' '*' always;
+            add_header 'Access-Control-Max-Age' '86400' always;
+            return 204;
+        }
+        
+        # CORS headers
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+        add_header 'Access-Control-Allow-Headers' '*' always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        
+        # Comprehensive URL rewriting to fix localhost:8080 issue
+        sub_filter_types application/json application/javascript text/javascript;
+        sub_filter_once off;
+        sub_filter 'http://localhost:8080' '$scheme://$host';
+        sub_filter 'https://localhost:8080' '$scheme://$host';
+        sub_filter 'localhost:8080' '$host';
+        sub_filter '"url":"http://localhost:8080' '"url":"$scheme://$host';
+        sub_filter '"servers":[{"url":"http://localhost:8080' '"servers":[{"url":"$scheme://$host';
+        sub_filter 'basePath":"http://localhost:8080' 'basePath":"$scheme://$host';
+        
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/swagger;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        
+        # Hide backend CORS headers to avoid duplication
+        proxy_hide_header 'Access-Control-Allow-Origin';
+        proxy_hide_header 'Access-Control-Allow-Methods';
+    }
+    
+    # OpenAPI JSON endpoints
+    location = /api/v1/openapi.json {
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Content-Type' 'application/json' always;
+        
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+    }
+    
+    location = /SmartAgricultureNutrition/api/v1/openapi.json {
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Content-Type' 'application/json' always;
+        
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+    }
+    
+    # Full application path (for backward compatibility)
+    location /SmartAgricultureNutrition/ {
+        # Handle OPTIONS preflight
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+            add_header 'Access-Control-Allow-Headers' '*' always;
+            add_header 'Access-Control-Max-Age' '86400' always;
+            add_header 'Content-Type' 'text/plain; charset=utf-8' always;
+            add_header 'Content-Length' '0' always;
+            return 204;
+        }
+        
+        # CORS headers
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+        add_header 'Access-Control-Allow-Headers' '*' always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # Hide backend CORS headers to avoid duplication
+        proxy_hide_header 'Access-Control-Allow-Origin';
+        proxy_hide_header 'Access-Control-Allow-Methods';
+        proxy_hide_header 'Access-Control-Allow-Headers';
+        proxy_hide_header 'Access-Control-Allow-Credentials';
+    }
+    
+    # Health check endpoint
+    location /health {
+        access_log off;
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/;
+        proxy_http_version 1.1;
+    }
+}
+EOF
+    else
+        print_message "Creating Nginx configuration for DuckDNS..." "$YELLOW"
+        # Create complete configuration if nginx.azure.conf doesn't exist
+        sudo tee /etc/nginx/sites-available/smart-agriculture-duckdns > /dev/null << EOF
+# DuckDNS domain server block
+server {
+    listen 80;
+    server_name $DUCKDNS_SUBDOMAIN.duckdns.org;
+    
+    client_max_body_size 10M;
+    
+    # Global URL rewriting to fix localhost:8080 in all responses
+    sub_filter_types application/json application/javascript text/javascript;
+    sub_filter_once off;
+    sub_filter 'http://localhost:8080' '\$scheme://\$host';
+    sub_filter 'https://localhost:8080' '\$scheme://\$host';
+    sub_filter 'localhost:8080' '\$host';
+    
+    # Root redirect to Swagger UI
+    location = / {
+        return 301 /api/v1/swagger;
+    }
+    
+    # API endpoints with CORS support
+    location /api/ {
+        # Handle CORS preflight requests
+        if (\$request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+            add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept,Origin,X-Api-Key,X-Auth-Token' always;
+            add_header 'Access-Control-Max-Age' '86400' always;
+            add_header 'Content-Type' 'text/plain; charset=utf-8' always;
+            add_header 'Content-Length' '0' always;
+            return 204;
+        }
+        
+        # CORS headers for all requests
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept,Origin,X-Api-Key,X-Auth-Token' always;
+        add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range,Authorization,X-Total-Count,Link' always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        add_header 'Access-Control-Max-Age' '86400' always;
+        
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/;
+        proxy_http_version 1.1;
         proxy_set_header Host \$host;
-        proxy_cache_bypass \$http_upgrade;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
+        proxy_set_header X-Forwarded-Host \$host;
+        proxy_set_header X-Forwarded-Port \$server_port;
+        
+        # Ensure CORS headers are not duplicated from backend
+        proxy_hide_header 'Access-Control-Allow-Origin';
+        proxy_hide_header 'Access-Control-Allow-Methods';
+        proxy_hide_header 'Access-Control-Allow-Headers';
+        proxy_hide_header 'Access-Control-Allow-Credentials';
     }
     
-    # Swagger UI
-    location /api/v1/swagger {
+    # Swagger UI specific endpoint with comprehensive URL fix
+    location = /api/v1/swagger {
+        # Handle OPTIONS preflight
+        if (\$request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+            add_header 'Access-Control-Allow-Headers' '*' always;
+            add_header 'Access-Control-Max-Age' '86400' always;
+            return 204;
+        }
+        
+        # CORS headers
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+        add_header 'Access-Control-Allow-Headers' '*' always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        
+        # Comprehensive URL rewriting to fix localhost:8080 issue
+        sub_filter_types application/json application/javascript text/javascript;
+        sub_filter_once off;
+        sub_filter 'http://localhost:8080' '\$scheme://\$host';
+        sub_filter 'https://localhost:8080' '\$scheme://\$host';
+        sub_filter 'localhost:8080' '\$host';
+        sub_filter '"url":"http://localhost:8080' '"url":"\$scheme://\$host';
+        sub_filter '"servers":[{"url":"http://localhost:8080' '"servers":[{"url":"\$scheme://\$host';
+        sub_filter 'basePath":"http://localhost:8080' 'basePath":"\$scheme://\$host';
+        
         proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/swagger;
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header X-Forwarded-Host \$host;
+        
+        # Hide backend CORS headers to avoid duplication
+        proxy_hide_header 'Access-Control-Allow-Origin';
+        proxy_hide_header 'Access-Control-Allow-Methods';
     }
     
-    # OpenAPI JSON
-    location /SmartAgricultureNutrition/api/v1/openapi.json {
+    # OpenAPI JSON endpoints
+    location = /api/v1/openapi.json {
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Content-Type' 'application/json' always;
+        
         proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json;
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
     }
     
-    location /api/v1/openapi.json {
+    location = /SmartAgricultureNutrition/api/v1/openapi.json {
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Content-Type' 'application/json' always;
+        
         proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json;
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
     }
     
-    # Full application path
+    # Full application path (for backward compatibility)
     location /SmartAgricultureNutrition/ {
+        # Handle OPTIONS preflight
+        if (\$request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+            add_header 'Access-Control-Allow-Headers' '*' always;
+            add_header 'Access-Control-Max-Age' '86400' always;
+            add_header 'Content-Type' 'text/plain; charset=utf-8' always;
+            add_header 'Content-Length' '0' always;
+            return 204;
+        }
+        
+        # CORS headers
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD' always;
+        add_header 'Access-Control-Allow-Headers' '*' always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        
         proxy_pass http://localhost:8080/SmartAgricultureNutrition/;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection 'upgrade';
         proxy_set_header Host \$host;
-        proxy_cache_bypass \$http_upgrade;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+        
+        # Hide backend CORS headers to avoid duplication
+        proxy_hide_header 'Access-Control-Allow-Origin';
+        proxy_hide_header 'Access-Control-Allow-Methods';
+        proxy_hide_header 'Access-Control-Allow-Headers';
+        proxy_hide_header 'Access-Control-Allow-Credentials';
+    }
+    
+    # Health check endpoint
+    location /health {
+        access_log off;
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/;
+        proxy_http_version 1.1;
     }
 }
 EOF
+    fi
     
     # Enable the new configuration
     sudo ln -sf /etc/nginx/sites-available/smart-agriculture-duckdns /etc/nginx/sites-enabled/
