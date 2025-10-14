@@ -105,8 +105,8 @@ server {
         return 301 /api/v1/swagger;
     }
     
-    # Handle OPTIONS preflight requests
-    location ~ ^/api/ {
+    # API endpoints
+    location /api/ {
         if (\$request_method = 'OPTIONS') {
             add_header 'Access-Control-Allow-Origin' '*' always;
             add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH' always;
@@ -119,7 +119,7 @@ server {
         
         include /etc/nginx/snippets/cors.conf;
         
-        proxy_pass http://localhost:8080/SmartAgricultureNutrition\$request_uri;
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/;
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
@@ -146,7 +146,16 @@ server {
     }
     
     # OpenAPI JSON
-    location ~ ^/(SmartAgricultureNutrition/)?api/v1/openapi\.json$ {
+    location = /api/v1/openapi.json {
+        include /etc/nginx/snippets/cors.conf;
+        
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        add_header Content-Type application/json;
+    }
+    
+    location = /SmartAgricultureNutrition/api/v1/openapi.json {
         include /etc/nginx/snippets/cors.conf;
         
         proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json;
@@ -199,7 +208,7 @@ server {
         return 301 /api/v1/swagger;
     }
     
-    location ~ ^/api/ {
+    location /api/ {
         if (\$request_method = 'OPTIONS') {
             add_header 'Access-Control-Allow-Origin' '*' always;
             add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH' always;
@@ -212,7 +221,7 @@ server {
         
         include /etc/nginx/snippets/cors.conf;
         
-        proxy_pass http://localhost:8080/SmartAgricultureNutrition\$request_uri;
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/;
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
