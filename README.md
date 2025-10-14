@@ -36,7 +36,7 @@ open http://localhost/SmartAgricultureNutrition/api/v1/swagger
 #### AWS EC2
 ```bash
 # SSH to EC2
-ssh -i your-key.pem ubuntu@ec2-ip
+ssh -i [your-key.pem] ubuntu@[your-ec2-ip]
 
 # Clone and deploy
 git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
@@ -50,7 +50,7 @@ cd Smart-Agriculture-Nutrition
 #### Azure VM
 ```bash
 # SSH to Azure VM
-ssh -i azure-key.pem azureuser@vm-ip
+ssh -i [your-key.pem] azureuser@[your-vm-ip]
 
 # Clone and deploy (includes all fixes)
 git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
@@ -122,14 +122,14 @@ SmartAgricultureNutrition/
 # Database
 POSTGRES_DB=smart_agriculture_nutrition
 POSTGRES_USER=agriculture_user
-POSTGRES_PASSWORD=your_secure_password
+POSTGRES_PASSWORD=[your-secure-password]
 
 # API Keys (optional)
-WEATHER_API_KEY=your_weather_api_key
-USDA_API_KEY=your_usda_api_key
+WEATHER_API_KEY=[your-weather-api-key]
+USDA_API_KEY=[your-usda-api-key]
 
 # Security
-JWT_SECRET=your_secure_jwt_secret
+JWT_SECRET=[your-secure-jwt-secret]
 ```
 
 ## 🚀 Deployment Guide
@@ -143,7 +143,7 @@ JWT_SECRET=your_secure_jwt_secret
 
 2. **Initial Deployment**
    ```bash
-   ssh -i your-key.pem ubuntu@ec2-ip
+   ssh -i [your-key.pem] ubuntu@[your-ec2-ip]
    git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
    cd Smart-Agriculture-Nutrition
    ./scripts/aws-deploy.sh
@@ -179,10 +179,10 @@ JWT_SECRET=your_secure_jwt_secret
 ```bash
 # Download the private key from Azure Portal
 # Set correct permissions
-chmod 400 your-key.pem
+chmod 400 [your-key.pem]
 
 # Connect via SSH
-ssh -i your-key.pem azureuser@YOUR_VM_PUBLIC_IP
+ssh -i [your-key.pem] azureuser@[YOUR-VM-PUBLIC-IP]
 ```
 
 #### Step 3: Deploy Application
@@ -205,8 +205,8 @@ chmod +x scripts/azure-deploy.sh
 
 #### Step 4: Verify Deployment
 After deployment completes, access your application:
-- **Swagger UI:** `http://YOUR_VM_PUBLIC_IP/api/v1/swagger`
-- **API Base:** `http://YOUR_VM_PUBLIC_IP/api/v1/`
+- **Swagger UI:** `http://[YOUR-VM-PUBLIC-IP]/api/v1/swagger`
+- **API Base:** `http://[YOUR-VM-PUBLIC-IP]/api/v1/`
 
 #### Step 5: Setup Custom Domain (Optional)
 ```bash
@@ -267,7 +267,7 @@ git pull origin main
 #### Azure VM - From Scratch
 ```bash
 # 1. SSH to VM
-ssh -i azure-key.pem azureuser@vm-ip
+ssh -i [your-key.pem] azureuser@[your-vm-ip]
 
 # 2. Clean everything (optional)
 docker stop $(docker ps -aq)

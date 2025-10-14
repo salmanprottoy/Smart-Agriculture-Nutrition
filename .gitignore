@@ -79,3 +79,6 @@ results/
 # Temporary files
 *.tmp
 *.temp
+
+# Presentation files (contains sensitive info)
+PRESENTATION_AZURE_DEPLOYMENT.md

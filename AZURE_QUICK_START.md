@@ -6,7 +6,7 @@
 
 ```bash
 # SSH to your Azure VM
-ssh azureuser@YOUR_VM_IP
+ssh azureuser@[YOUR-VM-IP]
 
 # Clone the repository
 git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
@@ -40,7 +40,7 @@ git pull origin main
 
 ```bash
 # SSH to VM
-ssh azureuser@YOUR_VM_IP
+ssh azureuser@[YOUR-VM-IP]
 
 # Stop and clean everything
 docker stop $(docker ps -aq)
@@ -130,12 +130,12 @@ crontab -l
 ## 📍 Access Points
 
 ### Via IP Address
-- Swagger UI: `http://YOUR_VM_IP/api/v1/swagger`
-- API Base: `http://YOUR_VM_IP/api/v1/`
+- Swagger UI: `http://[YOUR-VM-IP]/api/v1/swagger`
+- API Base: `http://[YOUR-VM-IP]/api/v1/`
 
 ### Via DuckDNS (After Setup)
-- HTTP: `http://your-domain.duckdns.org/api/v1/swagger`
-- HTTPS: `https://your-domain.duckdns.org/api/v1/swagger`
+- HTTP: `http://[your-domain].duckdns.org/api/v1/swagger`
+- HTTPS: `https://[your-domain].duckdns.org/api/v1/swagger`
 
 ## 💰 Cost Optimization
 
@@ -147,12 +147,12 @@ crontab -l
 ### Save Money
 1. **Stop VM when not in use**
    ```bash
-   az vm deallocate --resource-group YOUR_RG --name YOUR_VM
+   az vm deallocate --resource-group [YOUR-RG] --name [YOUR-VM]
    ```
 
 2. **Start VM when needed**
    ```bash
-   az vm start --resource-group YOUR_RG --name YOUR_VM
+   az vm start --resource-group [YOUR-RG] --name [YOUR-VM]
    ```
 
 3. **Use Azure $100 credit**
