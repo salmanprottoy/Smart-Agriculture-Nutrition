@@ -5,6 +5,7 @@
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.java.net/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)](https://docs.docker.com/compose/)
 [![AWS](https://img.shields.io/badge/AWS-EC2-orange.svg)](https://aws.amazon.com/ec2/)
+[![Azure](https://img.shields.io/badge/Azure-VM-blue.svg)](https://azure.microsoft.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://www.postgresql.org/)
 
 ## 🌐 Live Demo
@@ -30,8 +31,9 @@ docker-compose up -d --build
 open http://localhost/SmartAgricultureNutrition/api/v1/swagger
 ```
 
-### Production Deployment (AWS EC2)
+### Production Deployment
 
+#### AWS EC2
 ```bash
 # SSH to EC2
 ssh -i your-key.pem ubuntu@ec2-ip
@@ -39,10 +41,27 @@ ssh -i your-key.pem ubuntu@ec2-ip
 # Clone and deploy
 git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
 cd Smart-Agriculture-Nutrition
-./scripts/deploy.sh
+./scripts/aws-deploy.sh
 
 # For updates
-./scripts/quick-redeploy.sh
+./scripts/aws-quick-deploy.sh
+```
+
+#### Azure VM
+```bash
+# SSH to Azure VM
+ssh -i azure-key.pem azureuser@vm-ip
+
+# Clone and deploy
+git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
+cd SmartAgricultureNutrition
+./scripts/azure-deploy.sh
+
+# Fix any issues
+./scripts/archive/final-fix.sh
+
+# For updates after code changes
+./scripts/azure-quick-deploy.sh
 ```
 
 ## 📖 API Endpoints
@@ -81,8 +100,9 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 - **Database:** PostgreSQL 15
 - **Containerization:** Docker & Docker Compose
 - **Documentation:** OpenAPI 3.0, Swagger UI
-- **Cloud:** AWS EC2
+- **Cloud:** AWS EC2, Azure VM
 - **Domain:** DuckDNS (Dynamic DNS)
+- **SSL/TLS:** Let's Encrypt (Free HTTPS)
 
 ### Project Structure
 ```
@@ -127,32 +147,84 @@ JWT_SECRET=your_secure_jwt_secret
 2. **Initial Deployment**
    ```bash
    ssh -i your-key.pem ubuntu@ec2-ip
-   curl -O https://raw.githubusercontent.com/salmanprottoy/Smart-Agriculture-Nutrition/main/scripts/deploy.sh
-   chmod +x deploy.sh
-   ./deploy.sh
+   git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
+   cd Smart-Agriculture-Nutrition
+   ./scripts/aws-deploy.sh
    ```
 
-3. **Setup DuckDNS (Free Domain)**
-   - Register at https://www.duckdns.org
-   - Create subdomain
-   - Run on EC2:
+### Azure VM Setup
+
+1. **Create Azure VM**
+   - Ubuntu 22.04 LTS
+   - Standard B1s (1 vCPU, 1GB RAM) - ~$10/month
+   - Network Security Group: Open ports 22, 80, 443, 8080
+
+2. **Initial Deployment**
    ```bash
-   # Replace with your token
-   TOKEN="your-duckdns-token"
-   echo "curl -s 'https://www.duckdns.org/update?domains=your-domain&token=$TOKEN&ip=\$(curl -s ifconfig.me)'" > ~/update-duckdns.sh
-   chmod +x ~/update-duckdns.sh
-   (crontab -l 2>/dev/null; echo "*/5 * * * * ~/update-duckdns.sh") | crontab -
+   ssh -i azure-key.pem azureuser@vm-ip
+   git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
+   cd SmartAgricultureNutrition
+   ./scripts/azure-deploy.sh
+   
+   # Fix any issues (CORS, Swagger, etc.)
+   ./scripts/archive/final-fix.sh
    ```
 
-### Updating Code
+3. **Setup DuckDNS with HTTPS**
+   ```bash
+   ./scripts/archive/azure-duckdns-setup.sh
+   # Follow prompts for domain and HTTPS setup
+   ```
 
+### Updating Code (After Changes)
+
+#### AWS EC2
 ```bash
 # On local machine
 git add . && git commit -m "Update" && git push
 
 # On EC2
 cd ~/Smart-Agriculture-Nutrition
-./scripts/quick-redeploy.sh
+git pull origin main
+./scripts/aws-quick-deploy.sh
+```
+
+#### Azure VM
+```bash
+# On local machine
+git add . && git commit -m "Update" && git push
+
+# On Azure VM
+cd ~/SmartAgricultureNutrition
+git pull origin main
+./scripts/azure-quick-deploy.sh
+```
+
+### Complete Redeployment (If Starting Fresh)
+
+#### Azure VM - From Scratch
+```bash
+# 1. SSH to VM
+ssh -i azure-key.pem azureuser@vm-ip
+
+# 2. Clean everything (optional)
+docker stop $(docker ps -aq)
+docker rm $(docker ps -aq)
+docker system prune -af
+
+# 3. Clone fresh code
+rm -rf SmartAgricultureNutrition
+git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
+cd SmartAgricultureNutrition
+
+# 4. Deploy
+./scripts/azure-deploy.sh
+
+# 5. Fix configurations
+./scripts/archive/final-fix.sh
+
+# 6. Setup DuckDNS (optional)
+./scripts/archive/azure-duckdns-setup.sh
 ```
 
 **Note:** Database data persists across redeployments!
@@ -188,12 +260,19 @@ mvn jmeter:jmeter
 - Running: ~$19/month (t2.small)
 - Stopped: ~$2/month (storage only)
 
-**Save money:** Stop instance when not in use via AWS Console
+**Azure VM Costs:**
+- Running: ~$10-12/month (B1s)
+- Stopped: ~$1/month (storage only)
+- **$100 credit**: Lasts 8-10 months
+
+**Save money:** Stop instances when not in use via cloud console
 
 ## 📝 Documentation
 
 - **API Documentation:** [Swagger UI](http://smart-agriculture-nutrition.duckdns.org/SmartAgricultureNutrition/api/v1/swagger)
-- **Deployment Guide:** [AWS_EC2_DEPLOYMENT.md](AWS_EC2_DEPLOYMENT.md)
+- **AWS Deployment:** [AWS_EC2_DEPLOYMENT.md](AWS_EC2_DEPLOYMENT.md)
+- **Azure Deployment:** [AZURE_VM_DEPLOYMENT.md](AZURE_VM_DEPLOYMENT.md)
+- **Azure Quick Start:** [AZURE_QUICK_START.md](AZURE_QUICK_START.md)
 - **Management Guide:** [EC2_MANAGEMENT_GUIDE.md](EC2_MANAGEMENT_GUIDE.md)
 
 ## 🤝 Contributing

@@ -1,230 +1,229 @@
-# Azure VM Quick Start Guide 🚀
+# Azure VM Quick Start Guide
 
-## Create VM in Azure Portal (5 minutes)
+## 🚀 Quick Deployment Steps
 
-### 1️⃣ Go to Azure Portal
-👉 https://portal.azure.com
+### Step 1: Initial Setup (First Time Only)
 
-### 2️⃣ Create Virtual Machine
-- Click **"Create a resource"** → **"Virtual Machine"**
-
-### 3️⃣ Basic Configuration
-```
-✅ Resource Group: Create new → "SmartAgricultureRG"
-✅ VM Name: SmartAgricultureVM
-✅ Region: East US (or closest to you)
-✅ Image: Ubuntu Server 22.04 LTS
-✅ Size: Standard_B1s (1 vCPU, 1GB RAM) 💰 ~$10/month
-✅ Authentication: SSH public key
-✅ Username: azureuser
-```
-
-### 4️⃣ Networking
-```
-✅ Allow ports: SSH (22), HTTP (80), HTTPS (443)
-```
-
-### 5️⃣ Create & Download Key
-- Click **"Review + Create"** → **"Create"**
-- **⚠️ DOWNLOAD THE PRIVATE KEY WHEN PROMPTED!**
-
----
-
-## Deploy Application (10 minutes)
-
-### 1️⃣ Connect to VM
 ```bash
-# Mac/Linux
-chmod 400 ~/Downloads/azure_vm_key.pem
-ssh -i ~/Downloads/azure_vm_key.pem azureuser@YOUR_VM_IP
+# SSH to your Azure VM
+ssh azureuser@YOUR_VM_IP
 
-# Windows PowerShell
-ssh -i C:\Users\YourName\Downloads\azure_vm_key.pem azureuser@YOUR_VM_IP
+# Clone the repository
+git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
+cd SmartAgricultureNutrition
+
+# Run initial deployment
+./scripts/azure-deploy.sh
+
+# Fix any configuration issues
+./scripts/archive/final-fix.sh
+
+# Optional: Setup DuckDNS domain with HTTPS
+./scripts/archive/azure-duckdns-setup.sh
 ```
 
-### 2️⃣ Run Setup Script
+### Step 2: Updating After Code Changes
+
 ```bash
-# Download and run setup script
-wget https://raw.githubusercontent.com/salmanprottoy/Smart-Agriculture-Nutrition/main/scripts/azure-vm-setup.sh
-chmod +x azure-vm-setup.sh
-./azure-vm-setup.sh
-```
+# On your local machine
+git add .
+git commit -m "Your update message"
+git push origin main
 
-### 3️⃣ Configure API Keys
-```bash
-# Edit environment file
-nano ~/SmartAgricultureNutrition/.env
-
-# Add your API keys:
-WEATHER_API_KEY=your_actual_key_here
-USDA_API_KEY=your_actual_key_here
-
-# Save: Ctrl+X, Y, Enter
-
-# Restart application
-cd ~/SmartAgricultureNutrition
-sudo docker-compose -f docker-compose.prod.yml restart
-```
-
----
-
-## 🎉 Access Your Application
-
-```
-🌐 Main App: http://YOUR_VM_IP/
-📊 API: http://YOUR_VM_IP/api/v1/
-📚 Swagger: http://YOUR_VM_IP/api/v1/swagger
-```
-
----
-
-## 🌍 Setup DuckDNS Domain (Optional)
-
-Want a free domain name instead of using IP address? Use DuckDNS!
-
-### Get Your Free DuckDNS Domain
-1. Go to https://www.duckdns.org
-2. Sign in with GitHub/Google/Reddit
-3. Create a subdomain (e.g., `myapp`)
-4. Copy your token
-
-### Setup on Azure VM
-```bash
-# SSH to your VM
-ssh -i azure_vm_key.pem azureuser@YOUR_VM_IP
-
-# Download and run DuckDNS setup
-wget https://raw.githubusercontent.com/salmanprottoy/Smart-Agriculture-Nutrition/main/scripts/azure-duckdns-setup.sh
-chmod +x azure-duckdns-setup.sh
-./azure-duckdns-setup.sh
-
-# Enter your subdomain and token when prompted
-```
-
-### Access with Your Domain
-```
-🌐 http://yoursubdomain.duckdns.org
-🔒 https://yoursubdomain.duckdns.org (if HTTPS enabled)
-```
-
----
-
-## 💰 Cost Management Tips
-
-### Save Money with Auto-Shutdown
-In Azure Portal → Your VM → Auto-shutdown → Enable
-- Set time: 10 PM (or when you don't need it)
-- Saves ~50% of costs!
-
-### Stop VM When Not Using
-```bash
-# Via Azure Portal
-VM → Stop (Deallocate)
-
-# Via Azure CLI
-az vm deallocate -g SmartAgricultureRG -n SmartAgricultureVM
-```
-
-### Budget Tracking
-- B1s VM: ~$10-12/month
-- Your $100 credit = ~8-10 months of usage
-- Monitor usage in Azure Portal → Cost Management
-
----
-
-## 🛠️ Useful Commands
-
-### Check Application Status
-```bash
-# SSH into VM first
-ssh -i ~/Downloads/azure_vm_key.pem azureuser@YOUR_VM_IP
-
-# Check containers
-sudo docker ps
-
-# View logs
-cd ~/SmartAgricultureNutrition
-sudo docker-compose -f docker-compose.prod.yml logs -f
-```
-
-### Restart Application
-```bash
-cd ~/SmartAgricultureNutrition
-sudo docker-compose -f docker-compose.prod.yml restart
-```
-
-### Update Application
-```bash
+# On Azure VM
 cd ~/SmartAgricultureNutrition
 git pull origin main
-sudo docker-compose -f docker-compose.prod.yml down
-sudo docker-compose -f docker-compose.prod.yml build
-sudo docker-compose -f docker-compose.prod.yml up -d
+./scripts/azure-quick-deploy.sh
 ```
 
----
+### Step 3: Complete Fresh Start (If Needed)
 
-## 🆘 Troubleshooting
-
-### Can't Connect to VM?
-1. Check VM is running in Azure Portal
-2. Check your IP in Network Security Group
-3. Verify SSH key permissions: `chmod 400 your_key.pem`
-
-### Application Not Working?
 ```bash
-# Check if containers are running
+# SSH to VM
+ssh azureuser@YOUR_VM_IP
+
+# Stop and clean everything
+docker stop $(docker ps -aq)
+docker rm $(docker ps -aq)
+docker system prune -af
+sudo rm -rf SmartAgricultureNutrition
+
+# Start fresh
+git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
+cd SmartAgricultureNutrition
+
+# Deploy
+./scripts/azure-deploy.sh
+
+# Fix configurations
+./scripts/archive/final-fix.sh
+
+# Setup domain (optional)
+./scripts/archive/azure-duckdns-setup.sh
+```
+
+## 📋 Deployment Checklist
+
+### Initial Deployment
+- [ ] VM created with Ubuntu 22.04
+- [ ] Ports opened: 22, 80, 443, 8080
+- [ ] Repository cloned
+- [ ] `azure-deploy.sh` executed
+- [ ] `final-fix.sh` executed
+- [ ] Application accessible via IP
+
+### Optional Setup
+- [ ] DuckDNS domain configured
+- [ ] HTTPS enabled with Let's Encrypt
+- [ ] Port 443 opened in NSG
+
+### After Code Updates
+- [ ] Code pushed to GitHub
+- [ ] Pulled latest changes on VM
+- [ ] `azure-quick-deploy.sh` executed
+- [ ] Application tested
+
+## 🔧 Common Commands
+
+### Check Status
+```bash
+# View running containers
 sudo docker ps
 
-# Restart containers
-cd ~/SmartAgricultureNutrition
-sudo docker-compose -f docker-compose.prod.yml restart
+# Check application logs
+sudo docker-compose logs app
 
-# Check logs for errors
-sudo docker-compose -f docker-compose.prod.yml logs
-```
-
-### Need to Free Up Resources?
-```bash
-# Remove unused Docker images
-sudo docker system prune -a
+# Test Nginx configuration
+sudo nginx -t
 
 # Check disk space
 df -h
 ```
 
+### Troubleshooting
+```bash
+# If CORS errors persist
+./scripts/archive/final-fix.sh
+
+# If Swagger shows localhost:8080
+# Clear browser cache and run:
+./scripts/archive/final-fix.sh
+
+# If DuckDNS not working
+./scripts/archive/azure-duckdns-setup.sh
+
+# If containers won't start
+./scripts/azure-quick-deploy.sh
+```
+
+### Maintenance
+```bash
+# Clean up Docker resources
+docker system prune -af
+
+# Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Check DuckDNS updates
+cat ~/duckdns/duck.log
+
+# View cron jobs
+crontab -l
+```
+
+## 📍 Access Points
+
+### Via IP Address
+- Swagger UI: `http://YOUR_VM_IP/api/v1/swagger`
+- API Base: `http://YOUR_VM_IP/api/v1/`
+
+### Via DuckDNS (After Setup)
+- HTTP: `http://your-domain.duckdns.org/api/v1/swagger`
+- HTTPS: `https://your-domain.duckdns.org/api/v1/swagger`
+
+## 💰 Cost Optimization
+
+### VM Size: Standard B1s
+- 1 vCPU, 1 GB RAM
+- ~$10-12/month
+- Sufficient for API workload
+
+### Save Money
+1. **Stop VM when not in use**
+   ```bash
+   az vm deallocate --resource-group YOUR_RG --name YOUR_VM
+   ```
+
+2. **Start VM when needed**
+   ```bash
+   az vm start --resource-group YOUR_RG --name YOUR_VM
+   ```
+
+3. **Use Azure $100 credit**
+   - Lasts 8-10 months with B1s
+
+## 🔐 Security Notes
+
+1. **Network Security Group Rules**
+   - SSH (22): Your IP only
+   - HTTP (80): Public
+   - HTTPS (443): Public (if using SSL)
+   - App (8080): Consider restricting
+
+2. **Keep Updated**
+   ```bash
+   # Update packages regularly
+   sudo apt update && sudo apt upgrade -y
+   
+   # Update Docker images
+   docker-compose pull
+   ```
+
+3. **Backup Database**
+   ```bash
+   # Export database
+   docker exec postgres-db pg_dump -U agriculture_user smart_agriculture_nutrition > backup.sql
+   
+   # Import database
+   docker exec -i postgres-db psql -U agriculture_user smart_agriculture_nutrition < backup.sql
+   ```
+
+## 📝 Scripts Reference
+
+### Essential Scripts
+- `azure-deploy.sh` - Initial full deployment
+- `azure-quick-deploy.sh` - Quick updates after code changes
+
+### Fix Scripts (in archive/)
+- `final-fix.sh` - Fixes CORS, Swagger, and routing issues
+- `azure-duckdns-setup.sh` - Sets up DuckDNS domain with HTTPS
+- `complete-fix.sh` - Alternative comprehensive fix
+- `swagger-fix.sh` - Fixes Swagger UI server URL
+
+## ❓ FAQ
+
+**Q: Application not accessible after deployment?**
+A: Run `./scripts/archive/final-fix.sh` to fix Nginx configuration.
+
+**Q: CORS errors in Swagger UI?**
+A: Clear browser cache and run `./scripts/archive/final-fix.sh`.
+
+**Q: How to update after code changes?**
+A: Push to GitHub, then run `./scripts/azure-quick-deploy.sh` on VM.
+
+**Q: Database data lost after update?**
+A: Data persists in Docker volumes. Only lost if you run `docker volume prune`.
+
+**Q: HTTPS not working?**
+A: Ensure port 443 is open in NSG, then run `./scripts/archive/azure-duckdns-setup.sh`.
+
+## 🆘 Support
+
+For issues, check:
+1. Application logs: `sudo docker-compose logs app`
+2. Nginx logs: `sudo tail -f /var/log/nginx/error.log`
+3. Docker status: `sudo docker ps`
+
 ---
 
-## 📞 Get API Keys
-
-### Weather API (Free)
-1. Go to: https://openweathermap.org/api
-2. Sign up for free account
-3. Get your API key
-
-### USDA Food Data API (Free)
-1. Go to: https://fdc.nal.usda.gov/api-key-signup.html
-2. Fill the form
-3. Get your API key via email
-
----
-
-## 🎯 Next Steps
-
-1. **Set up auto-shutdown** to save costs
-2. **Add your API keys** to make the app fully functional
-3. **Set up budget alerts** in Azure Portal
-4. **Consider adding a domain name** (optional)
-
----
-
-## 📚 Full Documentation
-
-For detailed instructions and advanced configurations:
-- [Complete Azure Deployment Guide](AZURE_VM_DEPLOYMENT.md)
-- [AWS EC2 Deployment Guide](AWS_EC2_DEPLOYMENT.md)
-- [Project README](README.md)
-
----
-
-**Need Help?** Check the full documentation or create an issue on GitHub!
+**Remember:** Always run `final-fix.sh` after initial deployment to ensure everything works correctly!
