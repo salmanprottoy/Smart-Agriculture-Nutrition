@@ -14,6 +14,9 @@ cd SmartAgricultureNutrition
 
 # Run initial deployment (includes all fixes)
 ./scripts/azure-deploy.sh
+# You'll be prompted for:
+# - Weather API key (optional) - Get from: https://openweathermap.org/api
+# - USDA API key (optional) - Get from: https://fdc.nal.usda.gov/api-key-signup.html
 
 # Optional: Setup DuckDNS domain with HTTPS
 ./scripts/archive/azure-duckdns-setup.sh
@@ -184,11 +187,11 @@ crontab -l
 ## 📝 Scripts Reference
 
 ### Essential Scripts
-- `azure-deploy.sh` - Initial full deployment with all fixes included
+- `azure-deploy.sh` - Initial full deployment with all fixes + API key prompts
 - `azure-quick-deploy.sh` - Quick updates after code changes
 
 ### Optional Scripts (in archive/)
-- `azure-duckdns-setup.sh` - Sets up DuckDNS domain with HTTPS
+- `azure-duckdns-setup.sh` - Sets up DuckDNS domain with HTTPS (includes all Nginx fixes)
 - `final-fix.sh` - Standalone fix script (now integrated into azure-deploy.sh)
 
 ## ❓ FAQ
@@ -217,4 +220,9 @@ For issues, check:
 
 ---
 
-**Note:** The azure-deploy.sh script now includes all CORS, Swagger, and routing fixes automatically!
+**Note:** The azure-deploy.sh script now includes:
+- All CORS, Swagger, and routing fixes
+- Interactive API key configuration
+- Docker Compose 'ContainerConfig' error fixes
+- Nginx syntax error fixes
+- Auto-start service setup

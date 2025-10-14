@@ -79,49 +79,60 @@ ssh -i C:\Users\YourName\Downloads\azure_vm_key.pem azureuser@<your-vm-public-ip
 Once connected to your VM, run these commands:
 
 ```bash
-# Download the setup script
-wget https://raw.githubusercontent.com/salmanprottoy/Smart-Agriculture-Nutrition/main/scripts/azure-vm-setup.sh
+# Clone the repository
+git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
+cd SmartAgricultureNutrition
 
-# Make it executable
-chmod +x azure-vm-setup.sh
-
-# Run the setup script
-./azure-vm-setup.sh
+# Run the deployment script
+./scripts/azure-deploy.sh
 ```
 
-The script will automatically:
+The script will:
 - Update the system
 - Install Docker and Docker Compose
-- Clone the repository
-- Set up the application
-- Configure Nginx
+- Prompt for API keys (optional)
+- Set up the application with all fixes
+- Configure Nginx with CORS and URL rewriting
 - Start all services
+- Create auto-start service
 
-### Step 4: Configure API Keys
+### Step 4: Configure API Keys (If Skipped During Setup)
 
-After the script completes:
+The deployment script now prompts for API keys. If you skipped them:
 
 ```bash
 # Edit the environment file
 nano ~/SmartAgricultureNutrition/.env
 
 # Update these values with your actual API keys:
-# WEATHER_API_KEY=your_actual_weather_api_key
-# USDA_API_KEY=your_actual_usda_api_key
+# WEATHER_API_KEY=your_actual_weather_api_key  # Get from: https://openweathermap.org/api
+# USDA_API_KEY=your_actual_usda_api_key        # Get from: https://fdc.nal.usda.gov/api-key-signup.html
 
 # Save and exit (Ctrl+X, then Y, then Enter)
 
 # Restart the application
 cd ~/SmartAgricultureNutrition
-sudo docker-compose -f docker-compose.prod.yml restart
+sudo docker-compose -f docker-compose.azure.yml restart
 ```
 
 ### Step 5: Access Your Application
 
 Your application is now available at:
-- **Main Application**: `http://<your-vm-public-ip>/`
-- **API Endpoints**: `http://<your-vm-public-ip>/api/v1/`
 - **Swagger UI**: `http://<your-vm-public-ip>/api/v1/swagger`
+- **API Endpoints**: `http://<your-vm-public-ip>/api/v1/`
+- **Health Check**: `http://<your-vm-public-ip>/health`
+
+### Step 6: Optional - Setup Custom Domain with HTTPS
+
+```bash
+# Run DuckDNS setup for free domain + SSL
+./scripts/archive/azure-duckdns-setup.sh
+
+# Follow prompts for:
+# - DuckDNS subdomain
+# - DuckDNS token (from duckdns.org)
+# - HTTPS setup with Let's Encrypt
+```
 
 ---
 
@@ -239,10 +250,13 @@ APP_ENVIRONMENT=production
 
 After deployment, your application will be available at:
 
-- **Main Application**: `http://<vm-public-ip>/`
-- **API Endpoints**: `http://<vm-public-ip>/SmartAgricultureNutrition/api/v1/`
-- **Swagger UI**: `http://<vm-public-ip>/SmartAgricultureNutrition/api/v1/swagger`
-- **Direct Tomcat**: `http://<vm-public-ip>:8080/SmartAgricultureNutrition/`
+- **Swagger UI**: `http://<vm-public-ip>/api/v1/swagger` (No localhost:8080 issues!)
+- **API Endpoints**: `http://<vm-public-ip>/api/v1/`
+- **Direct Application**: `http://<vm-public-ip>:8080/SmartAgricultureNutrition/`
+
+With DuckDNS (optional):
+- **HTTPS**: `https://your-domain.duckdns.org/api/v1/swagger`
+- **HTTP**: `http://your-domain.duckdns.org/api/v1/swagger`
 
 ## Management Commands
 
@@ -263,19 +277,23 @@ docker logs agriculture-postgres
 ```bash
 # SSH into VM first, then:
 cd ~/SmartAgricultureNutrition
-docker-compose -f docker-compose.prod.yml restart
+sudo docker-compose -f docker-compose.azure.yml restart
 ```
 
-### Update Application:
+### Update Application After Code Changes:
 ```bash
-# Use the redeploy script
-./scripts/azure-redeploy.sh
+# Pull latest code
+cd ~/SmartAgricultureNutrition
+git pull origin main
+
+# Quick redeploy
+./scripts/azure-quick-deploy.sh
 ```
 
 ### View Logs:
 ```bash
 # SSH into VM first, then:
-docker-compose -f docker-compose.prod.yml logs -f
+sudo docker-compose -f docker-compose.azure.yml logs -f
 ```
 
 ## Cost Management
