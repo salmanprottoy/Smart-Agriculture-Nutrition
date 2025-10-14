@@ -31,6 +31,17 @@ print_header() {
 main() {
     print_header "Docker Cleanup and Fresh Deployment"
     
+    # Change to project root directory
+    SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    if [[ "$SCRIPT_DIR" == *"/scripts" ]]; then
+        PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+    else
+        PROJECT_DIR="$SCRIPT_DIR"
+    fi
+    
+    print_message "Changing to project directory: $PROJECT_DIR" "$BLUE"
+    cd "$PROJECT_DIR"
+    
     print_message "This script will clean up Docker and redeploy your application" "$YELLOW"
     read -p "Continue? (y/n): " -n 1 -r
     echo
