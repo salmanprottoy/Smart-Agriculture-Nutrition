@@ -45,10 +45,16 @@ main() {
     # Check for DuckDNS domain
     DUCKDNS_DOMAIN=""
     if [ -f ~/duckdns/duck.sh ]; then
-        DUCKDNS_DOMAIN=$(grep "domains=" ~/duckdns/duck.sh | cut -d'=' -f2 | cut -d'&' -f1)
-        if [ ! -z "$DUCKDNS_DOMAIN" ]; then
-            DUCKDNS_DOMAIN="$DUCKDNS_DOMAIN.duckdns.org"
+        # Extract just the subdomain part
+        DUCKDNS_DOMAIN=$(grep "domains=" ~/duckdns/duck.sh | sed -n 's/.*domains=\([^&]*\).*/\1/p')
+        if [ ! -z "$DUCKDNS_DOMAIN" ] && [ "$DUCKDNS_DOMAIN" != "https://www.duckdns.org/update?domains" ]; then
+            # Only add .duckdns.org if not already present
+            if [[ ! "$DUCKDNS_DOMAIN" == *".duckdns.org"* ]]; then
+                DUCKDNS_DOMAIN="$DUCKDNS_DOMAIN.duckdns.org"
+            fi
             print_message "DuckDNS domain: $DUCKDNS_DOMAIN" "$BLUE"
+        else
+            print_message "DuckDNS domain not properly configured" "$YELLOW"
         fi
     fi
     
@@ -78,7 +84,7 @@ EOF
 sub_filter 'http://localhost:8080' 'http://$PUBLIC_IP';
 sub_filter 'localhost:8080' '$PUBLIC_IP';
 sub_filter_once off;
-sub_filter_types application/json text/html application/javascript;
+sub_filter_types application/json application/javascript;
 EOF
     
     print_message "✓ Created CORS and URL rewrite configurations" "$GREEN"
@@ -112,7 +118,6 @@ server {
         }
         
         include /etc/nginx/snippets/cors.conf;
-        include /etc/nginx/snippets/url-rewrite.conf;
         
         proxy_pass http://localhost:8080/SmartAgricultureNutrition\$request_uri;
         proxy_http_version 1.1;
@@ -132,10 +137,6 @@ server {
         include /etc/nginx/snippets/cors.conf;
         include /etc/nginx/snippets/url-rewrite.conf;
         
-        # Inject correct server URL
-        sub_filter '</head>' '<script>window.onload = function() { setTimeout(function() { if(window.ui) { window.ui.preauthorizeApiKey("api_key", ""); } }, 1000); }</script></head>';
-        sub_filter_once on;
-        
         proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/swagger;
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
@@ -147,7 +148,6 @@ server {
     # OpenAPI JSON
     location ~ ^/(SmartAgricultureNutrition/)?api/v1/openapi\.json$ {
         include /etc/nginx/snippets/cors.conf;
-        include /etc/nginx/snippets/url-rewrite.conf;
         
         proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json;
         proxy_http_version 1.1;
@@ -158,7 +158,6 @@ server {
     # Full application path
     location /SmartAgricultureNutrition/ {
         include /etc/nginx/snippets/cors.conf;
-        include /etc/nginx/snippets/url-rewrite.conf;
         
         proxy_pass http://localhost:8080/SmartAgricultureNutrition/;
         proxy_http_version 1.1;
