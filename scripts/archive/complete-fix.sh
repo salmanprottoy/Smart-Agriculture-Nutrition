@@ -45,6 +45,14 @@ main() {
     # Step 1: Create comprehensive Nginx configuration
     print_header "Step 1: Fixing Nginx Configuration"
     
+    # First, clean up existing configurations
+    print_message "Cleaning up existing Nginx configurations..." "$BLUE"
+    $SUDO rm -f /etc/nginx/sites-enabled/smart-agriculture-duckdns 2>/dev/null || true
+    $SUDO rm -f /etc/nginx/sites-enabled/smart-agriculture 2>/dev/null || true
+    $SUDO rm -f /etc/nginx/sites-enabled/default 2>/dev/null || true
+    $SUDO rm -f /etc/nginx/snippets/swagger-headers.conf 2>/dev/null || true
+    print_message "✓ Cleaned up existing configurations" "$GREEN"
+    
     # Create CORS configuration
     $SUDO tee /etc/nginx/snippets/cors.conf > /dev/null << 'EOF'
 # CORS Headers
@@ -166,9 +174,9 @@ EOF
     
     print_message "✓ Nginx configuration created" "$GREEN"
     
-    # Enable the configuration
+    # Enable only this configuration
+    $SUDO rm -f /etc/nginx/sites-enabled/* 2>/dev/null || true
     $SUDO ln -sf /etc/nginx/sites-available/smart-agriculture /etc/nginx/sites-enabled/
-    $SUDO rm -f /etc/nginx/sites-enabled/default 2>/dev/null || true
     
     # Test Nginx
     print_message "Testing Nginx configuration..." "$BLUE"
