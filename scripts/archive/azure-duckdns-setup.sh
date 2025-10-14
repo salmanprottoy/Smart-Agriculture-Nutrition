@@ -179,8 +179,14 @@ server {
     
     client_max_body_size 10M;
     
-    location / {
-        proxy_pass http://localhost:8080/SmartAgricultureNutrition/;
+    # Root redirect to Swagger
+    location = / {
+        return 301 /api/v1/swagger;
+    }
+    
+    # API endpoints
+    location /api/ {
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -192,6 +198,42 @@ server {
         proxy_connect_timeout 60s;
         proxy_send_timeout 60s;
         proxy_read_timeout 60s;
+    }
+    
+    # Swagger UI
+    location /api/v1/swagger {
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/swagger;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+    
+    # OpenAPI JSON
+    location /SmartAgricultureNutrition/api/v1/openapi.json {
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+    }
+    
+    location /api/v1/openapi.json {
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+    }
+    
+    # Full application path
+    location /SmartAgricultureNutrition/ {
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
     }
 }
 EOF
