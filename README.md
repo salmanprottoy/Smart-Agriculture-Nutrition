@@ -52,13 +52,10 @@ cd Smart-Agriculture-Nutrition
 # SSH to Azure VM
 ssh -i azure-key.pem azureuser@vm-ip
 
-# Clone and deploy
+# Clone and deploy (includes all fixes)
 git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
 cd SmartAgricultureNutrition
 ./scripts/azure-deploy.sh
-
-# Fix any issues
-./scripts/archive/final-fix.sh
 
 # For updates after code changes
 ./scripts/azure-quick-deploy.sh
@@ -165,9 +162,7 @@ JWT_SECRET=your_secure_jwt_secret
    git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
    cd SmartAgricultureNutrition
    ./scripts/azure-deploy.sh
-   
-   # Fix any issues (CORS, Swagger, etc.)
-   ./scripts/archive/final-fix.sh
+   # Note: azure-deploy.sh now includes all CORS and Swagger fixes automatically
    ```
 
 3. **Setup DuckDNS with HTTPS**
@@ -217,13 +212,10 @@ rm -rf SmartAgricultureNutrition
 git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
 cd SmartAgricultureNutrition
 
-# 4. Deploy
+# 4. Deploy (includes all fixes)
 ./scripts/azure-deploy.sh
 
-# 5. Fix configurations
-./scripts/archive/final-fix.sh
-
-# 6. Setup DuckDNS (optional)
+# 5. Setup DuckDNS (optional)
 ./scripts/archive/azure-duckdns-setup.sh
 ```
 

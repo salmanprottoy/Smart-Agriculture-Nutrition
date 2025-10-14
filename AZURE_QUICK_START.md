@@ -12,11 +12,8 @@ ssh azureuser@YOUR_VM_IP
 git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
 cd SmartAgricultureNutrition
 
-# Run initial deployment
+# Run initial deployment (includes all fixes)
 ./scripts/azure-deploy.sh
-
-# Fix any configuration issues
-./scripts/archive/final-fix.sh
 
 # Optional: Setup DuckDNS domain with HTTPS
 ./scripts/archive/azure-duckdns-setup.sh
@@ -52,11 +49,8 @@ sudo rm -rf SmartAgricultureNutrition
 git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
 cd SmartAgricultureNutrition
 
-# Deploy
+# Deploy (includes all fixes)
 ./scripts/azure-deploy.sh
-
-# Fix configurations
-./scripts/archive/final-fix.sh
 
 # Setup domain (optional)
 ./scripts/archive/azure-duckdns-setup.sh
@@ -68,8 +62,7 @@ cd SmartAgricultureNutrition
 - [ ] VM created with Ubuntu 22.04
 - [ ] Ports opened: 22, 80, 443, 8080
 - [ ] Repository cloned
-- [ ] `azure-deploy.sh` executed
-- [ ] `final-fix.sh` executed
+- [ ] `azure-deploy.sh` executed (includes all fixes)
 - [ ] Application accessible via IP
 
 ### Optional Setup
@@ -191,22 +184,20 @@ crontab -l
 ## 📝 Scripts Reference
 
 ### Essential Scripts
-- `azure-deploy.sh` - Initial full deployment
+- `azure-deploy.sh` - Initial full deployment with all fixes included
 - `azure-quick-deploy.sh` - Quick updates after code changes
 
-### Fix Scripts (in archive/)
-- `final-fix.sh` - Fixes CORS, Swagger, and routing issues
+### Optional Scripts (in archive/)
 - `azure-duckdns-setup.sh` - Sets up DuckDNS domain with HTTPS
-- `complete-fix.sh` - Alternative comprehensive fix
-- `swagger-fix.sh` - Fixes Swagger UI server URL
+- `final-fix.sh` - Standalone fix script (now integrated into azure-deploy.sh)
 
 ## ❓ FAQ
 
 **Q: Application not accessible after deployment?**
-A: Run `./scripts/archive/final-fix.sh` to fix Nginx configuration.
+A: The azure-deploy.sh script includes all fixes. Clear browser cache and try again.
 
 **Q: CORS errors in Swagger UI?**
-A: Clear browser cache and run `./scripts/archive/final-fix.sh`.
+A: Clear browser cache completely. The deployment script already includes CORS fixes.
 
 **Q: How to update after code changes?**
 A: Push to GitHub, then run `./scripts/azure-quick-deploy.sh` on VM.
@@ -226,4 +217,4 @@ For issues, check:
 
 ---
 
-**Remember:** Always run `final-fix.sh` after initial deployment to ensure everything works correctly!
+**Note:** The azure-deploy.sh script now includes all CORS, Swagger, and routing fixes automatically!

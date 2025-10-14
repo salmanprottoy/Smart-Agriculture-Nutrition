@@ -137,9 +137,12 @@ clone_repository() {
     print_message "Repository ready" "$GREEN"
 }
 
-# Setup environment file
+# Setup environment file with CORS settings
 setup_env_file() {
     print_header "Setting Up Environment Configuration"
+    
+    # Get public IP for Swagger configuration
+    VM_IP=$(curl -s https://api.ipify.org 2>/dev/null || curl -s ifconfig.me)
     
     if [ -f ".env" ]; then
         print_message "Existing .env file found. Creating backup..." "$YELLOW"
@@ -178,7 +181,19 @@ APP_ENVIRONMENT=production
 EOF
     fi
     
-    print_message ".env file created" "$GREEN"
+    # Add CORS and Swagger configuration
+    print_message "Adding CORS and Swagger configuration..." "$BLUE"
+    echo "" >> .env
+    echo "# CORS Configuration" >> .env
+    echo "CORS_ENABLED=true" >> .env
+    echo "CORS_ALLOWED_ORIGINS=*" >> .env
+    echo "CORS_ALLOWED_METHODS=GET,POST,PUT,DELETE,OPTIONS,PATCH" >> .env
+    echo "CORS_ALLOWED_HEADERS=*" >> .env
+    echo "" >> .env
+    echo "# Swagger Configuration" >> .env
+    echo "SWAGGER_SERVER_URL=http://$VM_IP/SmartAgricultureNutrition" >> .env
+    
+    print_message "✓ .env file created with CORS settings" "$GREEN"
     print_message "IMPORTANT: Edit the .env file to add your actual API keys:" "$RED"
     print_message "  nano ~/SmartAgricultureNutrition/.env" "$YELLOW"
 }
@@ -212,32 +227,132 @@ start_application() {
     print_message "Application started successfully" "$GREEN"
 }
 
-# Configure Nginx
+# Configure Nginx with CORS and URL rewriting
 configure_nginx() {
-    print_header "Configuring Nginx Reverse Proxy"
+    print_header "Configuring Nginx with CORS and Fixes"
     
-    print_message "Creating Nginx configuration..." "$BLUE"
+    # Get public IP
+    VM_IP=$(curl -s https://api.ipify.org 2>/dev/null || curl -s ifconfig.me)
+    print_message "Public IP: $VM_IP" "$BLUE"
     
-    sudo tee /etc/nginx/sites-available/smart-agriculture > /dev/null << 'EOF'
+    # Clean up existing configurations
+    print_message "Cleaning existing Nginx configurations..." "$BLUE"
+    sudo rm -f /etc/nginx/sites-enabled/* 2>/dev/null || true
+    sudo rm -f /etc/nginx/snippets/swagger-headers.conf 2>/dev/null || true
+    
+    # Create CORS configuration
+    print_message "Creating CORS configuration..." "$BLUE"
+    sudo tee /etc/nginx/snippets/cors.conf > /dev/null << 'EOF'
+# CORS Headers
+add_header 'Access-Control-Allow-Origin' '*' always;
+add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH' always;
+add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept,Origin' always;
+add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range,Authorization' always;
+add_header 'Access-Control-Allow-Credentials' 'true' always;
+add_header 'Access-Control-Max-Age' '86400' always;
+EOF
+    
+    # Create URL rewrite configuration to fix localhost issue
+    sudo tee /etc/nginx/snippets/url-rewrite.conf > /dev/null << EOF
+# Rewrite localhost URLs in responses
+sub_filter 'http://localhost:8080' 'http://$VM_IP';
+sub_filter 'localhost:8080' '$VM_IP';
+sub_filter_once off;
+sub_filter_types application/json application/javascript;
+EOF
+    
+    print_message "Creating Nginx configuration with all fixes..." "$BLUE"
+    
+    sudo tee /etc/nginx/sites-available/smart-agriculture > /dev/null << EOF
 server {
-    listen 80;
+    listen 80 default_server;
     server_name _;
     
     client_max_body_size 10M;
     
-    location / {
-        proxy_pass http://localhost:8080/SmartAgricultureNutrition/;
+    # Include URL rewriting
+    include /etc/nginx/snippets/url-rewrite.conf;
+    
+    # Root redirect to Swagger
+    location = / {
+        return 301 /api/v1/swagger;
+    }
+    
+    # API endpoints with CORS
+    location /api/ {
+        if (\$request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH' always;
+            add_header 'Access-Control-Allow-Headers' '*' always;
+            add_header 'Access-Control-Max-Age' '86400' always;
+            add_header 'Content-Type' 'text/plain; charset=utf-8' always;
+            add_header 'Content-Length' '0' always;
+            return 204;
+        }
+        
+        include /etc/nginx/snippets/cors.conf;
+        
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header X-Forwarded-Host \$host;
+        proxy_set_header X-Forwarded-Port \$server_port;
         proxy_connect_timeout 60s;
         proxy_send_timeout 60s;
         proxy_read_timeout 60s;
+    }
+    
+    # Swagger UI specific
+    location = /api/v1/swagger {
+        include /etc/nginx/snippets/cors.conf;
+        include /etc/nginx/snippets/url-rewrite.conf;
+        
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/swagger;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+    
+    # OpenAPI JSON paths
+    location = /api/v1/openapi.json {
+        include /etc/nginx/snippets/cors.conf;
+        
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        add_header Content-Type application/json;
+    }
+    
+    location = /SmartAgricultureNutrition/api/v1/openapi.json {
+        include /etc/nginx/snippets/cors.conf;
+        
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/api/v1/openapi.json;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        add_header Content-Type application/json;
+    }
+    
+    # Full application path
+    location /SmartAgricultureNutrition/ {
+        include /etc/nginx/snippets/cors.conf;
+        
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+    
+    # Health check
+    location /health {
+        proxy_pass http://localhost:8080/SmartAgricultureNutrition/;
+        access_log off;
     }
 }
 EOF
@@ -245,19 +360,18 @@ EOF
     # Enable the site
     sudo ln -sf /etc/nginx/sites-available/smart-agriculture /etc/nginx/sites-enabled/
     
-    # Remove default site if it exists
-    sudo rm -f /etc/nginx/sites-enabled/default
-    
     # Test Nginx configuration
     print_message "Testing Nginx configuration..." "$BLUE"
-    sudo nginx -t
-    
-    # Restart Nginx
-    print_message "Restarting Nginx..." "$BLUE"
-    sudo systemctl restart nginx
-    sudo systemctl enable nginx
-    
-    print_message "Nginx configured successfully" "$GREEN"
+    if sudo nginx -t; then
+        # Restart Nginx
+        print_message "Restarting Nginx..." "$BLUE"
+        sudo systemctl restart nginx
+        sudo systemctl enable nginx
+        print_message "✓ Nginx configured successfully with CORS and fixes" "$GREEN"
+    else
+        print_message "✗ Nginx configuration error" "$RED"
+        exit 1
+    fi
 }
 
 # Setup firewall
@@ -326,33 +440,54 @@ EOF
     print_message "Auto-start service created" "$GREEN"
 }
 
-# Test application
+# Test application with CORS
 test_application() {
-    print_header "Testing Application"
+    print_header "Testing Application and CORS"
     
     print_message "Testing application endpoints..." "$BLUE"
     
     # Get VM IP
-    VM_IP=$(curl -s https://api.ipify.org)
+    VM_IP=$(curl -s https://api.ipify.org 2>/dev/null || curl -s ifconfig.me)
     
     # Test main endpoint
-    if curl -f http://localhost:8080/SmartAgricultureNutrition/ &> /dev/null; then
+    if curl -f -s http://localhost:8080/SmartAgricultureNutrition/ > /dev/null; then
         print_message "✓ Application is responding on port 8080" "$GREEN"
     else
         print_message "✗ Application is not responding on port 8080" "$RED"
     fi
     
     # Test Nginx proxy
-    if curl -f http://localhost/ &> /dev/null; then
+    if curl -f -s http://localhost/api/v1/swagger > /dev/null; then
         print_message "✓ Nginx proxy is working on port 80" "$GREEN"
     else
         print_message "✗ Nginx proxy is not working on port 80" "$RED"
     fi
     
-    print_message "\nApplication should be accessible at:" "$BLUE"
-    print_message "  http://$VM_IP/" "$GREEN"
-    print_message "  http://$VM_IP/api/v1/" "$GREEN"
-    print_message "  http://$VM_IP/api/v1/swagger" "$GREEN"
+    # Test CORS headers
+    print_message "Testing CORS headers..." "$BLUE"
+    CORS_TEST=$(curl -s -I -X OPTIONS http://$VM_IP/api/v1/auth/users \
+        -H "Origin: http://example.com" \
+        -H "Access-Control-Request-Method: GET" 2>/dev/null | grep -i "access-control-allow-origin" || echo "")
+    
+    if [ ! -z "$CORS_TEST" ]; then
+        print_message "✓ CORS headers present" "$GREEN"
+    else
+        print_message "⚠ CORS headers may need configuration" "$YELLOW"
+    fi
+    
+    # Test API endpoint
+    print_message "Testing API endpoint..." "$BLUE"
+    API_TEST=$(curl -s -w "\n%{http_code}" http://$VM_IP/api/v1/auth/users 2>/dev/null | tail -1)
+    if [ "$API_TEST" = "200" ] || [ "$API_TEST" = "403" ]; then
+        print_message "✓ API endpoint responding (HTTP $API_TEST)" "$GREEN"
+    else
+        print_message "⚠ API endpoint returned HTTP $API_TEST" "$YELLOW"
+    fi
+    
+    print_message "\nApplication is accessible at:" "$BLUE"
+    print_message "  Swagger UI: http://$VM_IP/api/v1/swagger" "$GREEN"
+    print_message "  API Base: http://$VM_IP/api/v1/" "$GREEN"
+    print_message "  Health: http://$VM_IP/health" "$GREEN"
 }
 
 # Display summary
