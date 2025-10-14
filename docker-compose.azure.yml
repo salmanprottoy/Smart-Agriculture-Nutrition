@@ -61,7 +61,6 @@ services:
       # JVM memory settings optimized for Azure B1s
       JAVA_OPTS: "-Xmx384m -Xms128m -XX:MaxMetaspaceSize=128m -XX:+UseG1GC"
     ports:
-      - "80:8080"
       - "8080:8080"
     networks:
       - agriculture-network

@@ -64,8 +64,8 @@ services:
       # JVM memory settings for container
       JAVA_OPTS: "-XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0"
     ports:
-      - "80:8080" # Map external port 80 to internal port 8080
-      - "8080:8080" # Direct access (optional)
+      - "8080:8080" # Direct access
+      # Port 80 is handled by Nginx reverse proxy
     networks:
       - agriculture-network
     restart: unless-stopped
