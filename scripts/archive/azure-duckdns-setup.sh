@@ -232,34 +232,99 @@ EOF
     print_message "  crontab -l  # View cron jobs" "$CYAN"
 }
 
-# Optional: Setup HTTPS with Let's Encrypt
+# Setup HTTPS with Let's Encrypt
 setup_https() {
-    print_header "HTTPS Setup with Let's Encrypt (Optional)"
+    print_header "HTTPS Setup with Let's Encrypt"
     
-    read -p "Do you want to setup HTTPS with Let's Encrypt? (y/n): " -n 1 -r
+    print_message "Do you want to setup HTTPS with Let's Encrypt?" "$YELLOW"
+    print_message "This will enable secure HTTPS access to your API." "$YELLOW"
+    read -p "Setup HTTPS? (y/n): " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         print_message "Skipping HTTPS setup" "$YELLOW"
+        print_message "You can run this script again later to enable HTTPS" "$CYAN"
+        return
+    fi
+    
+    # Check if domain is set
+    if [ -z "$DUCKDNS_SUBDOMAIN" ]; then
+        print_message "Error: DuckDNS subdomain not set!" "$RED"
         return
     fi
     
     print_message "Installing Certbot..." "$BLUE"
-    sudo apt-get update
+    sudo apt-get update -qq
     sudo apt-get install -y certbot python3-certbot-nginx
     
-    print_message "Obtaining SSL certificate..." "$BLUE"
-    sudo certbot --nginx -d $DUCKDNS_SUBDOMAIN.duckdns.org --non-interactive --agree-tos --email admin@$DUCKDNS_SUBDOMAIN.duckdns.org --redirect
+    # First, ensure port 443 is open in Azure NSG
+    print_message "IMPORTANT: Make sure port 443 is open in Azure Network Security Group!" "$YELLOW"
+    print_message "Go to Azure Portal > Your VM > Networking > Add inbound port rule for 443" "$YELLOW"
+    read -p "Press Enter when port 443 is open in Azure NSG..."
     
-    print_message "✓ HTTPS enabled!" "$GREEN"
-    print_message "Your application is now accessible at:" "$GREEN"
-    print_message "  🔒 https://$DUCKDNS_SUBDOMAIN.duckdns.org" "$YELLOW"
+    print_message "Obtaining SSL certificate for $DUCKDNS_SUBDOMAIN.duckdns.org..." "$BLUE"
     
-    # Setup auto-renewal
-    print_message "Setting up auto-renewal..." "$BLUE"
-    sudo systemctl enable certbot.timer
-    sudo systemctl start certbot.timer
+    # Get user email for Let's Encrypt
+    print_message "Enter your email for Let's Encrypt notifications:" "$BLUE"
+    read -p "Email: " USER_EMAIL
     
-    print_message "✓ SSL certificate will auto-renew" "$GREEN"
+    if [ -z "$USER_EMAIL" ]; then
+        USER_EMAIL="admin@$DUCKDNS_SUBDOMAIN.duckdns.org"
+    fi
+    
+    # Run certbot
+    sudo certbot --nginx \
+        -d $DUCKDNS_SUBDOMAIN.duckdns.org \
+        --non-interactive \
+        --agree-tos \
+        --email $USER_EMAIL \
+        --redirect \
+        --expand
+    
+    if [ $? -eq 0 ]; then
+        print_message "✓ HTTPS enabled successfully!" "$GREEN"
+        
+        # Update Nginx configuration to handle WebSocket for Swagger UI
+        sudo tee /tmp/nginx-ssl-fix.conf > /dev/null << 'EOF'
+# Additional headers for HTTPS
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+add_header X-Frame-Options "SAMEORIGIN" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-XSS-Protection "1; mode=block" always;
+EOF
+        
+        # Apply the additional headers
+        sudo sed -i '/listen 443 ssl/a\    include /tmp/nginx-ssl-fix.conf;' /etc/nginx/sites-enabled/smart-agriculture-duckdns
+        
+        # Test and reload Nginx
+        sudo nginx -t && sudo systemctl reload nginx
+        
+        print_message "Your application is now accessible at:" "$GREEN"
+        print_message "  🔒 https://$DUCKDNS_SUBDOMAIN.duckdns.org" "$YELLOW"
+        print_message "  🔒 https://$DUCKDNS_SUBDOMAIN.duckdns.org/api/v1/swagger" "$YELLOW"
+        echo
+        print_message "HTTP requests will automatically redirect to HTTPS" "$CYAN"
+        
+        # Setup auto-renewal
+        print_message "Setting up auto-renewal..." "$BLUE"
+        sudo systemctl enable certbot.timer
+        sudo systemctl start certbot.timer
+        
+        # Test renewal
+        print_message "Testing certificate renewal..." "$BLUE"
+        sudo certbot renew --dry-run
+        
+        if [ $? -eq 0 ]; then
+            print_message "✓ SSL certificate auto-renewal configured" "$GREEN"
+        else
+            print_message "⚠ Auto-renewal test failed, but certificate is installed" "$YELLOW"
+        fi
+    else
+        print_message "✗ Failed to obtain SSL certificate" "$RED"
+        print_message "Common issues:" "$YELLOW"
+        print_message "  1. Port 443 not open in Azure NSG" "$CYAN"
+        print_message "  2. Domain not pointing to this server" "$CYAN"
+        print_message "  3. Rate limit exceeded (wait 1 hour)" "$CYAN"
+    fi
 }
 
 # Main execution
