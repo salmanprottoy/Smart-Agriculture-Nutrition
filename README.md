@@ -149,27 +149,94 @@ JWT_SECRET=your_secure_jwt_secret
    ./scripts/aws-deploy.sh
    ```
 
-### Azure VM Setup
+### Azure VM Setup - Step by Step
 
-1. **Create Azure VM**
-   - Ubuntu 22.04 LTS
-   - Standard B1s (1 vCPU, 1GB RAM) - ~$10/month
-   - Network Security Group: Open ports 22, 80, 443, 8080
+#### Step 1: Create Azure VM
+1. **Login to Azure Portal** (https://portal.azure.com)
+2. **Create a Virtual Machine:**
+   - Click "Create a resource" → "Virtual Machine"
+   - **Basics:**
+     - Resource Group: Create new or use existing
+     - VM Name: `SmartAgricultureVM`
+     - Region: Choose nearest to you
+     - Image: `Ubuntu Server 22.04 LTS`
+     - Size: `Standard B1s` (1 vCPU, 1GB RAM) - ~$10-12/month
+     - Authentication: SSH public key (recommended)
+   - **Networking:**
+     - Create new Virtual Network (default is fine)
+     - Public IP: Yes (Basic)
+   - **Review + Create** → Click "Create"
 
-2. **Initial Deployment**
-   ```bash
-   ssh -i azure-key.pem azureuser@vm-ip
-   git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
-   cd SmartAgricultureNutrition
-   ./scripts/azure-deploy.sh
-   # Note: azure-deploy.sh now includes all CORS and Swagger fixes automatically
-   ```
+3. **Configure Network Security Group (NSG):**
+   - Go to VM → Networking → Add inbound port rule
+   - Add these ports:
+     - SSH (22) - Source: Your IP only
+     - HTTP (80) - Source: Any
+     - HTTPS (443) - Source: Any
+     - App (8080) - Source: Any
 
-3. **Setup DuckDNS with HTTPS**
-   ```bash
-   ./scripts/archive/azure-duckdns-setup.sh
-   # Follow prompts for domain and HTTPS setup
-   ```
+#### Step 2: Connect to VM
+```bash
+# Download the private key from Azure Portal
+# Set correct permissions
+chmod 400 your-key.pem
+
+# Connect via SSH
+ssh -i your-key.pem azureuser@YOUR_VM_PUBLIC_IP
+```
+
+#### Step 3: Deploy Application
+```bash
+# Clone the repository
+git clone https://github.com/salmanprottoy/Smart-Agriculture-Nutrition.git
+cd SmartAgricultureNutrition
+
+# Run the deployment script (includes all fixes)
+chmod +x scripts/azure-deploy.sh
+./scripts/azure-deploy.sh
+
+# The script will:
+# - Install Docker and Docker Compose
+# - Install Nginx
+# - Configure CORS and URL rewriting
+# - Start the application
+# - Set up auto-start on reboot
+```
+
+#### Step 4: Verify Deployment
+After deployment completes, access your application:
+- **Swagger UI:** `http://YOUR_VM_PUBLIC_IP/api/v1/swagger`
+- **API Base:** `http://YOUR_VM_PUBLIC_IP/api/v1/`
+
+#### Step 5: Setup Custom Domain (Optional)
+```bash
+# Run DuckDNS setup for free domain + HTTPS
+./scripts/archive/azure-duckdns-setup.sh
+
+# You'll need:
+# 1. DuckDNS account (free at duckdns.org)
+# 2. Choose subdomain
+# 3. Enter your DuckDNS token
+# 4. Optionally enable HTTPS with Let's Encrypt
+```
+
+After DuckDNS setup:
+- **HTTPS:** `https://your-domain.duckdns.org/api/v1/swagger`
+- **HTTP:** `http://your-domain.duckdns.org/api/v1/swagger`
+
+#### Step 6: Configure API Keys
+```bash
+# Edit the .env file
+nano ~/SmartAgricultureNutrition/.env
+
+# Add your actual API keys:
+# - WEATHER_API_KEY
+# - USDA_API_KEY
+
+# Restart application
+cd ~/SmartAgricultureNutrition
+sudo docker-compose -f docker-compose.azure.yml restart
+```
 
 ### Updating Code (After Changes)
 
