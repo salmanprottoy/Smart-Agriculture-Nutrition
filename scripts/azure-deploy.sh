@@ -211,11 +211,29 @@ start_application() {
         print_message "Using standard production Docker Compose configuration..." "$YELLOW"
     fi
     
+    # Fix for Docker Compose 'ContainerConfig' error
+    print_message "Cleaning up any existing containers..." "$BLUE"
+    sudo docker-compose -f $COMPOSE_FILE down --remove-orphans 2>/dev/null || true
+    
+    # Remove problematic containers if they exist
+    sudo docker rm -f agriculture-postgres smart-agriculture-app 2>/dev/null || true
+    
+    # Clean up volumes to avoid conflicts
+    print_message "Cleaning up old volumes..." "$BLUE"
+    sudo docker volume prune -f 2>/dev/null || true
+    
     print_message "Building Docker images..." "$BLUE"
     sudo docker-compose -f $COMPOSE_FILE build
     
-    print_message "Starting containers..." "$BLUE"
-    sudo docker-compose -f $COMPOSE_FILE up -d
+    print_message "Starting containers with fresh state..." "$BLUE"
+    # Use docker compose (v2) if available, otherwise fall back to docker-compose
+    if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+        print_message "Using Docker Compose V2..." "$GREEN"
+        sudo docker compose -f $COMPOSE_FILE up -d --force-recreate
+    else
+        print_message "Using Docker Compose V1..." "$YELLOW"
+        sudo docker-compose -f $COMPOSE_FILE up -d --force-recreate --renew-anon-volumes
+    fi
     
     print_message "Waiting for services to start..." "$YELLOW"
     sleep 30
@@ -224,7 +242,22 @@ start_application() {
     print_message "Container status:" "$BLUE"
     sudo docker ps
     
-    print_message "Application started successfully" "$GREEN"
+    # Check if containers are actually running
+    if sudo docker ps | grep -q "smart-agriculture-app"; then
+        print_message "✓ Application container is running" "$GREEN"
+    else
+        print_message "⚠ Application container may not be running properly" "$YELLOW"
+        print_message "Checking logs..." "$BLUE"
+        sudo docker-compose -f $COMPOSE_FILE logs --tail=20
+    fi
+    
+    if sudo docker ps | grep -q "postgres"; then
+        print_message "✓ Database container is running" "$GREEN"
+    else
+        print_message "⚠ Database container may not be running properly" "$YELLOW"
+    fi
+    
+    print_message "Application deployment attempted" "$GREEN"
 }
 
 # Configure Nginx with CORS and URL rewriting
